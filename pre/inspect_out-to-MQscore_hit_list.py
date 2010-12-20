@@ -25,7 +25,7 @@ for line in f_in:
     if( line.startswith('#') ):
         continue
     tokens = line.strip().split("\t")
-    filename = os.path.basename(tokens[0])
+    filename = os.path.basename(tokens[0]).split('.')[0]
     scan_id = int(tokens[1])
     pep_seq = tokens[2].split('.')[1]
     prot_id = tokens[3].replace('XXX.','xf_')
