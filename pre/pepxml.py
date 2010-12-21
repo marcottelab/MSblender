@@ -20,7 +20,7 @@ class pepxml_parser(xml.sax.ContentHandler):
             else:
                 print "Duplicate PSM : %s"%self.spectrum_id
             self.PSM[self.spectrum_id]['charge'] = int(attr['assumed_charge'])
-            self.PSM[self.spectrum_id]['neutral_mass'] = float(attr['precursor_neutral_mass'])
+            self.PSM[self.spectrum_id]['precursor_mz'] = float(attr['precursor_neutral_mass'])/self.PSM[self.spectrum_id]['charge']
         if( len(self.element_array) == 5 and name == 'search_hit' ):
             self.is_search_hit = True
             self.search_hit = dict()
@@ -31,8 +31,11 @@ class pepxml_parser(xml.sax.ContentHandler):
             if( attr.has_key('protein_descr') ):
                 self.search_hit['protein_descr'] = attr['protein_descr']
             self.search_hit['missed_cleavages'] = -1
-            if( attr.has_key('missed_cleavages') ):
+            if( attr.has_key('num_missed_cleavages') ):
                 self.search_hit['missed_cleavages'] = int(attr['num_missed_cleavages'])
+            self.search_hit['massdiff'] = -1.0
+            if( attr.has_key('massdiff') ):
+                self.search_hit['massdiff'] = float(attr['massdiff'])
         if( len(self.element_array) == 6 and name == 'search_score' ):
             ## SEQUEST
             if(attr['name'] == 'xcorr'):
