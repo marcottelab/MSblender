@@ -16,8 +16,8 @@ for line in f_hit_list:
     if( line.startswith('#') ):
         continue
     tokens = line.strip().split("\t")
-    prot_id = tokens[4]
-    score = float(tokens[6])
+    prot_id = tokens[5]
+    score = float(tokens[-1])
     if( prot_id.startswith('xf_') ):
         decoy_list.append( score )
     else:
