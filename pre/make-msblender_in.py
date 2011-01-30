@@ -22,8 +22,8 @@ for line in f_conf:
         tokens = line.strip().split("\t")
         sp_id =  tokens[0]
         charge = tokens[1]
-        pep_seq = tokens[3]
-        prot_id = tokens[4]
+        pep_seq = tokens[4]
+        prot_id = tokens[5]
         sp_pep_id = '%s.%s'%(sp_id,pep_seq)
         if( not sp2hit.has_key( sp_pep_id ) ):
             sp2hit[sp_pep_id] = dict()

@@ -4,7 +4,7 @@ import sys
 import re
 import pepxml
 
-usage_mesg = 'Usage: inspect-pepxml2hit_list.py <.pepxml file>'
+usage_mesg = 'Usage: inspect_pepxml-to-MQscore_hit_list.py <.pepxml file>'
 
 if( len(sys.argv) != 2 ):
     print usage_mesg
@@ -20,7 +20,7 @@ PSM = pepxml.parse_by_filename(filename_pepxml)
 
 filename_out = filename_pepxml
 filename_out = re.sub('.pepxml$','',filename_out)
-filename_out += '.hit_list'
+filename_out += '.MQscore_hit_list'
 sys.stderr.write("Write %s ... \n"%filename_out)
 f_out = open(filename_out,'w')
 f_out.write("# pepxml: %s\n"%filename_pepxml)

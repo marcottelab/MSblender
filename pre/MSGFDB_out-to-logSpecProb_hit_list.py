@@ -28,7 +28,7 @@ for line in f_in:
     filename = os.path.basename(tokens[0]).split('.')[0]
     scan_id = int(tokens[1])
 
-    pep_seq = tokens[6].split('.')[1]
+    pep_seq = tokens[6].split('.')[1].upper()
     prot_id = tokens[7].replace('XXX.','xf_')
     charge = int(tokens[5])
     precursor_mz = float(tokens[3])
