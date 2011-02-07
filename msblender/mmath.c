@@ -60,7 +60,9 @@ double vec_max(const double *vec, int len) {
 double vec_cond_sum(const double *vec, const double *cond, int len) {
   int i;
   double res = 0.0;
-  for(i=0;i<len;i++) if(cond[i] > 0.0) res+=vec[i];
+  for(i=0;i<len;i++) {
+    if(cond[i] > 0.0) res+=vec[i];
+  }
   return res;
 }
 
@@ -73,14 +75,39 @@ double vec_cond_max(const double *vec, const double *cond, int len) {
   return res;
 }
 
+int vec_cond_max_id(const double *vec, const double *cond, int len) {
+  int i,id;
+  double res = GSL_NEGINF;
+  for(i=0;i<len;i++) {
+    if(res<vec[i] && cond[i] > 0.0) {
+      res=vec[i];
+      id = i;
+    }
+  }
+  return id;
+}
+
+
 double vec_cond_min(const double *vec, const double *cond, int len) {
   int i;
   double res;
-  res=vec[0];
-  for(i=1;i<len;i++) {
-    if(res>vec[i] && cond[i]) res=vec[i];
+  res= GSL_POSINF;
+  for(i=0;i<len;i++) {
+    if(res>vec[i] && cond[i] > 0.0) res=vec[i];
   }
   return res;
+}
+
+int vec_cond_min_id(const double *vec, const double *cond, int len) {
+  int i,id;
+  double res = GSL_POSINF;
+  for(i=0;i<len;i++) {
+    if(res>vec[i] && cond[i] > 0.0) {
+      res=vec[i];
+      id = i;
+    }
+  }
+  return id;
 }
 
 

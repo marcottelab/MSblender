@@ -37,6 +37,7 @@ typedef struct tagDATA {
   gsl_matrix *X;
   int *is_decoy;
   int *is_complete;
+  int *is_solo;
 } DATA;
 
 typedef struct tagPAR {
@@ -47,6 +48,7 @@ typedef struct tagPAR {
   int ncomp0;
 
   /* key parameters */
+  double *pi_solo;
   double pi; /* proportion of true */
   double *piT;
   double **piF; /* per engine */
@@ -122,7 +124,8 @@ int vec_max_index(const double *vec, int len);
 double vec_cond_max(const double *vec, const double *cond, int len);
 double vec_cond_min(const double *vec, const double *cond, int len);
 double vec_cond_sum(const double *vec, const double *cond, int len);
-
+int vec_cond_max_id(const double *vec, const double *cond, int len);
+int vec_cond_min_id(const double *vec, const double *cond, int len);
 
 
 

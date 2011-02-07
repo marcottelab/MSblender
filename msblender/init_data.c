@@ -15,13 +15,13 @@ void free_data(DATA *data) {
 void read_data(FILE *fp, DATA *data, int *p, int *n) {
   int i,j;
   char buf[_MAX_BUF_];
-  int ct_decoy;
+  int ct_decoy, ct_na;
 
   data->N = *n;
 
   assert(data->is_decoy = (int *) calloc(*p, sizeof(int)));
   assert(data->is_complete = (int *) calloc(*p, sizeof(int)));
-
+  assert(data->is_solo = (int *) calloc(*p, sizeof(int)));
 
   ct_decoy = 0;
   for(j=0;j<(data->N+2);j++) fscanf(fp, "%s",buf);
@@ -33,9 +33,12 @@ void read_data(FILE *fp, DATA *data, int *p, int *n) {
     if(data->is_decoy[i]) ct_decoy++;
     for(j=0;j<data->N;j++) {
       fscanf(fp, "%s",buf);
-      if(strcmp(buf, "NA") == 0) data->is_complete[i] = 0;
+      if(strcmp(buf, "NA") == 0) {
+        data->is_complete[i] = 0;
+      }
     }
   }
+
   rewind(fp); 
   data->P = *p;
   data->P0 = ct_decoy;
@@ -71,6 +74,17 @@ void read_data(FILE *fp, DATA *data, int *p, int *n) {
       }
     }
   }
+
+  for(i=0;i<*p;i++) {
+    ct_na = data->N;
+    for(j=0;j<data->N;j++) if(gsl_matrix_get(data->X,i,j) == _missval_) ct_na--;
+    if(ct_na != 1) data->is_solo[i] = -1;
+    else {
+      for(j=0;j<data->N;j++) if(gsl_matrix_get(data->X,i,j) != _missval_) data->is_solo[i] = j;
+    }
+  }
+
+
 }
 
 
