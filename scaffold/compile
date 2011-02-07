@@ -1,0 +1,5 @@
+#! /bin/sh
+gcc -Wall -c *.c *.h
+gcc *.o -lgsl -lgslcblas -lm -o agreementScore
+rm -rf *.o
+
