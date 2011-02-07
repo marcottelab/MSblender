@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 
   /* Output */
   strcpy(newName, argv[1]);
-  strcat(newName, "_msblender");
+  strcat(newName, ".msblender_out");
   FILE *fpout = fopen(newName, "w");
   writeResult(fpout, &par, &data); 
 
