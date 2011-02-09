@@ -45,5 +45,5 @@ for spectrum_id in PSM.keys():
             missed_cleavages = tmp_hit['missed_cleavages']
             massdiff = tmp_hit['massdiff']
     if( best_mqscore > -100 ):
-        f_out.write("%s\t%s\t%f\t%f\t%s\t%s\t%d\t%f\t%f\n"%(spectrum_id,charge,precursor_mz,massdiff,best_peptide,best_protein,missed_cleavages,best_mqscore,best_deltascore))
+        f_out.write("%s\t%s\t%f\t%f\t%s\t%s\t%d\t%f\n"%(spectrum_id,charge,precursor_mz,massdiff,best_peptide,best_protein,missed_cleavages,best_mqscore))
 f_out.close()

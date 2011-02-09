@@ -33,10 +33,10 @@ for line in f_conf:
         sp_pep_id_list = []
         sp_id_tokens = sp_id.split('.')
         if( sp_id_tokens[-3] == sp_id_tokens[-2] ):
-            sp_pep_id_list.append( '%s.%s.%s.%s'%('.'.join(sp_id_tokens[:-3]),sp_id_tokens[-2],sp_id_tokens[-1],pep_seq) )
+            sp_pep_id_list.append( '%s.%05d.%s.%s'%('.'.join(sp_id_tokens[:-3]),int(sp_id_tokens[-2]),sp_id_tokens[-1],pep_seq) )
         else:
             for tmp_id in range(int(sp_id_tokens[-3]),int(sp_id_tokens[-2])+1):
-                sp_pep_id_list.append( '%s.%s.%s.%s'%('.'.join(sp_id_tokens[:-3]),tmp_id,sp_id_tokens[-1],pep_seq) )
+                sp_pep_id_list.append( '%s.%05d.%s.%s'%('.'.join(sp_id_tokens[:-3]),tmp_id,sp_id_tokens[-1],pep_seq) )
 
         for sp_pep_id in sp_pep_id_list:
             if( not sp2hit.has_key( sp_pep_id ) ):
@@ -45,15 +45,18 @@ for line in f_conf:
             score_list.append(float(tokens[-1]))
     f_hit_list.close()
 
+    score_list = sorted(score_list)
     idx_median = int( len(score_list)*0.5 )
     score_median = score_list[idx_median]
+    var_list = sorted([abs(x - score_median) for x in score_list])
     score_mad = sorted([abs(x - score_median) for x in score_list])[idx_median]
     if( len(score_list) % 2 == 0 ):
         score_median = (score_list[idx_median-1] + score_list[idx_median])*0.5
         score_mad_list = sorted([abs(x - score_median) for x in score_list])
         score_mad = (score_mad_list[idx_median-1] + score_mad_list[idx_median])*0.5
     search_median[search_engine_name] = score_median
-    search_mad[search_engine_name] = score_mad
+    search_mad[search_engine_name] = score_mad * 1.4826
+    sys.stderr.write("%s,%d,%f,%f\n"%(search_engine_name,idx_median,score_median,score_mad))
 f_conf.close()
 
 search_engine_list = sorted(search_engine_list)
@@ -65,7 +68,7 @@ for sp_pep_id in sorted(sp2hit.keys()):
     for tmp_search_engine_name in search_engine_list:
         if( sp2hit[sp_pep_id].has_key( tmp_search_engine_name ) ):
             tmp_score = sp2hit[sp_pep_id][tmp_search_engine_name]['score']
-            tmp_score = (tmp_score - search_median[tmp_search_engine_name])/search_mad[search_engine_name]
+            tmp_score = (tmp_score - search_median[tmp_search_engine_name])/search_mad[tmp_search_engine_name]
             output_list.append( "%f"%tmp_score )
             for tmp_decoy_tag in decoy_tag_list:
                 if( sp2hit[sp_pep_id][tmp_search_engine_name]['prot_id'].startswith(tmp_decoy_tag) ):
