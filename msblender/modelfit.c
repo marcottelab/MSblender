@@ -6,10 +6,10 @@ void alloc_par(PAR *par, DATA *data) {
   par->N = data->N;
   par->P = data->P;
   par->P0 = data->P0;
+  par->ncase = pow(2, data->N);
 
   par->pi = 0.1;
-  assert(par->pi_solo = (double *) calloc(par->N, sizeof(double)));
-  for(i=0;i<par->N;i++) par->pi_solo[i] = 0.1;
+  assert(par->pi_case = (double *) calloc(par->ncase, sizeof(double)));
   assert(par->piT = (double *) calloc(par->ncomp, sizeof(double)));
   assert(par->piF = (double **) calloc(par->N, sizeof(double *)));
   for(i=0;i<par->N;i++) assert(par->piF[i] = (double *) calloc(par->ncomp0, sizeof(double)));
@@ -40,7 +40,6 @@ void printVector(const gsl_vector *V, int m) {
   }
   fprintf(stdout, "\n");
 }
-
 
 void printMatrix(const gsl_matrix *M, int m) {
   int i,j;
@@ -258,6 +257,7 @@ void init_par(PAR *par, DATA *data, const gsl_rng *r) {
   double eq;
   double mean[data->N];
   double stdev[data->N];
+  par->ncase = data->ncase;
 
   /* initial values */
   eq = 1.0 / ((double) par->ncomp);
@@ -276,11 +276,17 @@ void init_par(PAR *par, DATA *data, const gsl_rng *r) {
     if(data->is_decoy[i]) par->z[i] = 0.0;
     else par->z[i] = 0.5;
   }
+
+  for(j=0;j<data->ncase;j++) {
+    par->pi_case[j] = 0.2;
+  }
+  
 }
 
 void EM1(PAR *par, DATA *data) {
   /* pi, piT, piF, z */
-  int i,j,k;    
+  int i,j,k,cc,l,m;    
+  int km[data->ncase];
   double maxp, sump;
   double maxp0[data->N];
   double pos_sum, neg_sum;
@@ -295,7 +301,10 @@ void EM1(PAR *par, DATA *data) {
   int negMode[data->N];
 
   for(i=0;i<par->ncomp;i++) par->detT[i] = determ(par->SigmaT[i], data->N);
-  for(i=0;i<par->ncomp;i++) condT[i] = par->detT[i] * par->piT[i] > 0.0 ? 1.0 : 0.0;
+  for(i=0;i<par->ncomp;i++) {
+    if(par->detT[i] <= 0.0) par->piT[i] = 0.0;
+  }
+  for(i=0;i<par->ncomp;i++) condT[i] = par->detT[i]  > 0.0 ? 1.0 : 0.0;
 
   double tmp_MuT[par->ncomp];
   for(j=0;j<data->N;j++) {
@@ -304,6 +313,7 @@ void EM1(PAR *par, DATA *data) {
   }
 
   for(j=0;j<data->N;j++) {
+    for(i=0;i<par->ncomp0;i++) if(par->SigmaF[j][i] <= 0.0) par->piF[j][i] = 0.0;
     for(i=0;i<par->ncomp0;i++) condF[j][i] = par->piF[j][i] * par->SigmaF[j][i] > 0.0 ? 1.0 : 0.0;
     negMode[j] = vec_cond_min_id(par->MuF[j], condF[j], par->ncomp0);
   }
@@ -315,7 +325,7 @@ void EM1(PAR *par, DATA *data) {
       for(k=0;k<par->ncomp ;k++) if(condT[k] > 0.0) lik[k] = 0.0;
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
         if(condT[k] > 0.0) lik[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
       maxp = vec_cond_max(lik, condT, par->ncomp);
@@ -338,7 +348,7 @@ void EM1(PAR *par, DATA *data) {
   for(j=0;j<par->N;j++) {
     for(k=0;k<par->ncomp0;k++) par->zFsum[k] = 0.0;
     for(i=0;i<data->P;i++) {    
-      if(data->is_decoy[i]) {
+      if(1) {
         x[j] = gsl_matrix_get(data->X, i, j);    
         if(x[j] != _missval_) {
           for(k=0;k<par->ncomp0 ;k++) if(condF[j][k] > 0.0) lik[k] = 0.0;
@@ -371,7 +381,7 @@ void EM1(PAR *par, DATA *data) {
 
       for(k=0;k<par->ncomp;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
         if(condT[k] > 0.0) likT[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
       maxp = vec_cond_max(likT, condT, par->ncomp);
@@ -415,37 +425,30 @@ void EM1(PAR *par, DATA *data) {
       pos_sum = exp(pos_sum);
       neg_sum = exp(neg_sum);
 
-      par->z[i] = par->pi * pos_sum / (par->pi * pos_sum + (1.0 - par->pi) * neg_sum);
+      cc = data->app[i];
+      par->z[i] = par->pi_case[cc] * pos_sum / (par->pi_case[cc] * pos_sum + (1.0 - par->pi_case[cc]) * neg_sum);
     }
     else par->z[i] = 0.0;
   }
 
   par->pi = 0.0;
-  k = 0;
+  for(i=0;i<data->ncase;i++) par->pi_case[i] = 0.0;
+  for(i=0;i<data->ncase;i++) km[i] = 0;
   for(i=0;i<data->P;i++) {
-    if(data->is_decoy[i]) {}
+    if(data->is_decoy[i] ) {}
     else {
       par->pi += par->z[i];
-      k++;
-    }
-  }
-  par->pi /= ((double) k);
-
-  /* update Pi_solo */
-  for(j=0;j<data->N;j++) {
-    par->pi_solo[j] = 0.0;
-    k = 0;
-    for(i=0;i<data->P;i++) {
-      if(data->is_decoy[i]) {}
-      else {
-        if(data->is_solo[i] == j) {
-          par->pi_solo[j] += par->z[i];
-          k++;
+      m = data->app[i];
+      for(l=1;l<data->ncase;l++) {
+        if(data->tab[l][m]) {
+          par->pi_case[l] += par->z[i];
+          km[l]++;
         }
       }
     }
-    par->pi_solo[j] /= ((double) k);
   }
+  par->pi /= ((double) k);
+  for(i=1;i<data->ncase;i++) par->pi_case[i] /= ((double) km[i]);
 
 }
 
@@ -485,10 +488,10 @@ void EM2(PAR *par, DATA *data) {
     for(j=0;j<data->N;j++) liksum[i][j] = 0.0;
   }
   for(i=0;i<data->P;i++) {
-    if(data->is_complete[i]) {
+    if(data->is_decoy[i] == 0) {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) lik[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
       maxp = vec_cond_max(lik, condT, par->ncomp);
@@ -498,7 +501,7 @@ void EM2(PAR *par, DATA *data) {
       for(k=0;k<par->ncomp ;k++) if(condT[k] > 0.0) lik[k] /= sump;
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           for(j=0;j<data->N;j++) if(x[j] != _missval_) liksum[k][j] += lik[k] * par->z[i];    
           for(j=0;j<data->N;j++) {
@@ -530,10 +533,10 @@ void EM2(PAR *par, DATA *data) {
     }
   }
   for(i=0;i<data->P;i++) {
-    if(data->is_complete[i]) {
+    if(data->is_decoy[i] == 0)  {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           lik[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
         }
@@ -545,7 +548,7 @@ void EM2(PAR *par, DATA *data) {
       for(k=0;k<par->ncomp ;k++) if(condT[k] > 0.0) lik[k] /= sump;
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           for(s=0;s<data->N;s++) {
             for(t=0;t<data->N;t++) {
@@ -700,7 +703,7 @@ void SCORE(PAR *par, DATA *data) {
   for(i=0;i<data->P;i++) {
     for(k=0;k<par->ncomp;k++) {
       for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);
-      for(j=0;j<data->N;j++) if(x[j] != _missval_  && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k], j));    
+      for(j=0;j<data->N;j++) if(x[j] != _missval_  && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k], j));    
       if(condT[k] > 0.0) {
         likT[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
@@ -747,10 +750,8 @@ void SCORE(PAR *par, DATA *data) {
     pos_sum = exp(pos_sum);
     neg_sum = exp(neg_sum);
 
-     par->z[i] = par->pi * pos_sum / (par->pi * pos_sum + (1.0 - par->pi) * neg_sum);
-     if(data->is_solo[i] == -1) par->z[i] = par->pi * pos_sum / (par->pi * pos_sum + (1.0 - par->pi) * neg_sum);   
-     else par->z[i] = par->pi_solo[data->is_solo[i]] * pos_sum / (par->pi_solo[data->is_solo[i]] * pos_sum + (1.0 - par->pi_solo[data->is_solo[i]]) * neg_sum);  
-
+    j = data->app[i];
+    par->z[i] = par->pi_case[j] * pos_sum / (par->pi_case[j] * pos_sum + (1.0 - par->pi_case[j]) * neg_sum);   
   }
 }
 
@@ -770,8 +771,11 @@ double logLik(PAR *par, DATA *data) {
 
   for(i=0;i<par->ncomp;i++) par->detT[i] = determ(par->SigmaT[i], data->N);
   for(i=0;i<par->ncomp;i++) condT[i] = par->detT[i] * par->piT[i] > 0.0 ? 1.0 : 0.0;
+
+  double tmp_MuT[par->ncomp];
   for(j=0;j<data->N;j++) {
-    for(i=0;i<par->ncomp0;i++) condF[j][i] = par->piF[j][i] * par->SigmaF[j][i] > 0.0 ? 1.0 : 0.0;
+    for(k=0;k<par->ncomp;k++) tmp_MuT[k] = gsl_vector_get(par->MuT[k],j);
+    posMode[j] = vec_cond_max_id(tmp_MuT, condT, par->ncomp);
   }
 
   for(j=0;j<data->N;j++) {
@@ -785,7 +789,7 @@ double logLik(PAR *par, DATA *data) {
     if(data->is_decoy[i] == 0) {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j]) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           likT[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);
         }
@@ -804,7 +808,7 @@ double logLik(PAR *par, DATA *data) {
         x[j] = gsl_matrix_get(data->X,i,j);
         if(x[j] != _missval_) {
           for(k=0;k<par->ncomp0 ;k++) {
-            x[j] = GSL_MAX(gsl_matrix_get(data->X,i,j), par->MuF[j][k]);
+            // x[j] = GSL_MAX(gsl_matrix_get(data->X,i,j), par->MuF[j][k]);
             if(condF[j][k] > 0.0) {
               likF[j][k] = log_gaussian_pdf(x[j], par->MuF[j][k], par->SigmaF[j][k]);
             }
@@ -821,8 +825,8 @@ double logLik(PAR *par, DATA *data) {
       }
       maxp = GSL_MAX(tsum, fsum);
      
-      tsum = par->pi * exp(tsum - maxp);
-      fsum = (1.0 - par->pi) * exp(fsum - maxp);
+      tsum = par->pi_case[data->app[i]] * exp(tsum - maxp);
+      fsum = (1.0 - par->pi_case[data->app[i]]) * exp(fsum - maxp);
       tmp = maxp + log(tsum + fsum);
 
       if(gsl_finite(tmp)) loglik += tmp;
@@ -853,11 +857,13 @@ void mvEM(PAR *par, DATA *data, int niter, const gsl_rng *r) {
     newlik = logLik(par, data);
 
     fprintf(stdout, "%d ", i+1);
-    /* fprintf(stdout, "%d\t%.6f\t%.4f\n", i+1, newlik, par->pi); 
-    for(j=0;j<data->N;j++) fprintf(stdout, "%.3f\t", par->pi_solo[j]); 
-    fprintf(stdout, "\n"); */
-    /*
-    int k;
+    if(data->ncase > 2) fprintf(stdout, "\n");
+    int j;
+    if(data->ncase > 2) {
+      for(j=1;j<data->ncase;j++) fprintf(stdout, "Case %d %.3f\n", j, par->pi_case[j]);  
+      fprintf(stdout, "\n**********\n");  
+    }
+    /* int k;
     fprintf(stdout, "TRUE\n");
     for(k=0;k<par->ncomp;k++) {
       fprintf(stdout, "%.3f\n", par->piT[k]);
@@ -873,12 +879,8 @@ void mvEM(PAR *par, DATA *data, int niter, const gsl_rng *r) {
       } 
       fprintf(stdout, "\n");
     }
-    fprintf(stdout, "\n");
-    */
-    if(fabs(newlik - oldlik) <= 0.0001) {
-      break;
-    }            
-  }
+    fprintf(stdout, "\n"); */
+  } 
   fprintf(stdout, "\n");
   
   SCORE(par, data);

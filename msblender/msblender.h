@@ -32,23 +32,26 @@ typedef struct tagDATA {
   int N;
   int P;
   int P0;
+  int ncase;
   char **engine;
   char **peptide;
   gsl_matrix *X;
   int *is_decoy;
   int *is_complete;
-  int *is_solo;
+  int *app;  /* appear case 2^N*/
+  int **tab;  /* which case to add to Pi_k */
 } DATA;
 
 typedef struct tagPAR {
   int N;  /* number of search engines */
   int P;  /* number of peptides - forward */
   int P0; /* number of peptides - decoy */
+  int ncase;
   int ncomp;  
   int ncomp0;
 
   /* key parameters */
-  double *pi_solo;
+  double *pi_case;
   double pi; /* proportion of true */
   double *piT;
   double **piF; /* per engine */

@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
   T = gsl_rng_default;
   r = gsl_rng_alloc(T);
 
-  if (argc != 5) {
-    fprintf(stderr, "usage: msblender [data] [ncompPos] [ncompNeg] [niter]\n");
+  if (argc != 4) {
+    fprintf(stderr, "usage: msblender [data] [ncompPos] [ncompNeg]\n");
     return 1;
   }
   FILE *fp = fopen(argv[1], "r");
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
   }
   par.ncomp = atoi(argv[2]);
   par.ncomp0 = atoi(argv[3]);
-  niter = atoi(argv[4]);
+  niter = 30;
 
   p = nrow(fp) - 1;
   rewind(fp);
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 
   /* Output */
   strcpy(newName, argv[1]);
-  strcat(newName, ".msblender_out");
+  strcat(newName, "_msblender");
   FILE *fpout = fopen(newName, "w");
   writeResult(fpout, &par, &data); 
 
