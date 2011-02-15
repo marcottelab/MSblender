@@ -1,5 +1,5 @@
 #! /bin/sh
 gcc -Wall -c *.c *.h
-gcc *.o -lgsl -lgslcblas -lm -o ../msblender
+gcc *.o -lgsl -lgslcblas -lm -o ./msblender
 rm -rf *.o
 
