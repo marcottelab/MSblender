@@ -286,7 +286,7 @@ void init_par(PAR *par, DATA *data, const gsl_rng *r) {
 void EM1(PAR *par, DATA *data) {
   /* pi, piT, piF, z */
   int i,j,k,cc,l,m;    
-  int km[data->ncase];
+  double km[data->ncase];
   double maxp, sump;
   double maxp0[data->N];
   double pos_sum, neg_sum;
@@ -313,7 +313,7 @@ void EM1(PAR *par, DATA *data) {
   }
 
   for(j=0;j<data->N;j++) {
-    for(i=0;i<par->ncomp0;i++) if(par->SigmaF[j][i] <= 0.0) par->piF[j][i] = 0.0;
+    for(i=0;i<par->ncomp0;i++) if(par->SigmaF[j][i] <= 0.00001) par->piF[j][i] = 0.0;
     for(i=0;i<par->ncomp0;i++) condF[j][i] = par->piF[j][i] * par->SigmaF[j][i] > 0.0 ? 1.0 : 0.0;
     negMode[j] = vec_cond_min_id(par->MuF[j], condF[j], par->ncomp0);
   }
@@ -325,7 +325,7 @@ void EM1(PAR *par, DATA *data) {
       for(k=0;k<par->ncomp ;k++) if(condT[k] > 0.0) lik[k] = 0.0;
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
         if(condT[k] > 0.0) lik[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
       maxp = vec_cond_max(lik, condT, par->ncomp);
@@ -375,13 +375,24 @@ void EM1(PAR *par, DATA *data) {
     }
   }
 
+  for(i=0;i<par->ncomp;i++) par->detT[i] = determ(par->SigmaT[i], data->N);
+  for(i=0;i<par->ncomp;i++) {
+    if(par->detT[i] <= 0.0) par->piT[i] = 0.0;
+  }
+  for(i=0;i<par->ncomp;i++) condT[i] = par->detT[i]  > 0.0 ? 1.0 : 0.0;
+
+  for(j=0;j<data->N;j++) {
+    for(i=0;i<par->ncomp0;i++) if(par->SigmaF[j][i] <= 0.00001) par->piF[j][i] = 0.0;
+    for(i=0;i<par->ncomp0;i++) condF[j][i] = par->piF[j][i] * par->SigmaF[j][i] > 0.0 ? 1.0 : 0.0;
+  }
+
 
   for(i=0;i<data->P;i++) {
     if(data->is_decoy[i] == 0) {
 
       for(k=0;k<par->ncomp;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));
         if(condT[k] > 0.0) likT[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
       maxp = vec_cond_max(likT, condT, par->ncomp);
@@ -433,7 +444,7 @@ void EM1(PAR *par, DATA *data) {
 
   par->pi = 0.0;
   for(i=0;i<data->ncase;i++) par->pi_case[i] = 0.0;
-  for(i=0;i<data->ncase;i++) km[i] = 0;
+  for(i=0;i<data->ncase;i++) km[i] = 1.0;
   for(i=0;i<data->P;i++) {
     if(data->is_decoy[i] ) {}
     else {
@@ -441,14 +452,20 @@ void EM1(PAR *par, DATA *data) {
       m = data->app[i];
       for(l=1;l<data->ncase;l++) {
         if(data->tab[l][m]) {
-          par->pi_case[l] += par->z[i];
-          km[l]++;
+          if(m == l) {
+            par->pi_case[l] += par->z[i];
+            km[l] += 1.0;
+          }
+          else {
+            par->pi_case[l] += par->z[i] * 0.1;
+            km[l] += 0.1;
+          }
         }
       }
     }
   }
   par->pi /= ((double) k);
-  for(i=1;i<data->ncase;i++) par->pi_case[i] /= ((double) km[i]);
+  for(i=1;i<data->ncase;i++) par->pi_case[i] /= (km[i]);
 
 }
 
@@ -491,7 +508,7 @@ void EM2(PAR *par, DATA *data) {
     if(data->is_decoy[i] == 0) {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) lik[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
       maxp = vec_cond_max(lik, condT, par->ncomp);
@@ -501,7 +518,7 @@ void EM2(PAR *par, DATA *data) {
       for(k=0;k<par->ncomp ;k++) if(condT[k] > 0.0) lik[k] /= sump;
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           for(j=0;j<data->N;j++) if(x[j] != _missval_) liksum[k][j] += lik[k] * par->z[i];    
           for(j=0;j<data->N;j++) {
@@ -536,7 +553,7 @@ void EM2(PAR *par, DATA *data) {
     if(data->is_decoy[i] == 0)  {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           lik[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
         }
@@ -548,7 +565,7 @@ void EM2(PAR *par, DATA *data) {
       for(k=0;k<par->ncomp ;k++) if(condT[k] > 0.0) lik[k] /= sump;
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           for(s=0;s<data->N;s++) {
             for(t=0;t<data->N;t++) {
@@ -703,7 +720,7 @@ void SCORE(PAR *par, DATA *data) {
   for(i=0;i<data->P;i++) {
     for(k=0;k<par->ncomp;k++) {
       for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);
-      for(j=0;j<data->N;j++) if(x[j] != _missval_  && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k], j));    
+      for(j=0;j<data->N;j++) if(x[j] != _missval_  && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k], j));    
       if(condT[k] > 0.0) {
         likT[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);    
       }
@@ -789,7 +806,7 @@ double logLik(PAR *par, DATA *data) {
     if(data->is_decoy[i] == 0) {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
-        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] && data->N==1) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
+        for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
         if(condT[k] > 0.0) {
           likT[k] = log_mgaussian_marginal_pdf(x, par->MuT[k], par->SigmaT[k], data->N);
         }
@@ -846,40 +863,13 @@ void mvEM(PAR *par, DATA *data, int niter, const gsl_rng *r) {
   for(i=0;i<niter;i++) {
     if(i==0) oldlik = GSL_NEGINF;
     else oldlik = newlik;
-
     oldpi = newpi;
-
     EM1(par, data);
     EM2(par, data);
-    EM3(par, data);
-    
+    EM3(par, data);    
     newpi = par->pi;
     newlik = logLik(par, data);
-
     fprintf(stdout, "%d ", i+1);
-    if(data->ncase > 2) fprintf(stdout, "\n");
-    int j;
-    if(data->ncase > 2) {
-      for(j=1;j<data->ncase;j++) fprintf(stdout, "Case %d %.3f\n", j, par->pi_case[j]);  
-      fprintf(stdout, "\n**********\n");  
-    }
-    /* int k;
-    fprintf(stdout, "TRUE\n");
-    for(k=0;k<par->ncomp;k++) {
-      fprintf(stdout, "%.3f\n", par->piT[k]);
-      printVector(par->MuT[k], par->N);
-      fprintf(stdout, "\n");
-      printMatrix(par->SigmaT[k], par->N);
-      fprintf(stdout, "\n");
-    }
-    fprintf(stdout, "FALSE\n");
-    for(j=0;j<par->N;j++) {
-      for(k=0;k<par->ncomp0;k++) {
-        fprintf(stdout, "%.3f\t%.3f\t%.3f\n", par->piF[j][k], par->MuF[j][k], par->SigmaF[j][k]);
-      } 
-      fprintf(stdout, "\n");
-    }
-    fprintf(stdout, "\n"); */
   } 
   fprintf(stdout, "\n");
   

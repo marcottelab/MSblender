@@ -40,6 +40,7 @@ typedef struct tagDATA {
   int *is_complete;
   int *app;  /* appear case 2^N*/
   int **tab;  /* which case to add to Pi_k */
+  int **tab_use;
 } DATA;
 
 typedef struct tagPAR {

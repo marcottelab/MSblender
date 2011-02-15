@@ -12,7 +12,7 @@ void free_data(DATA *data) {
   free(data->is_decoy);
 }
 
-void fill_tab(int **tab, int n) {
+void fill_tab(int **tab, int **tab_use, int n) {
   int i, j, k, ncase;
   int div, res;
   int pos, neg;
@@ -32,6 +32,7 @@ void fill_tab(int **tab, int n) {
     for(j=(n-1);j>=0;j--) {
       div = res / pow(2,j);
       use[i][j] = div;
+      tab_use[i][j] = use[i][j];
       res -= div * pow(2,j);
     }  
   }
@@ -65,7 +66,9 @@ void read_data(FILE *fp, DATA *data, int *p, int *n) {
   assert(data->app = (int *) calloc(*p, sizeof(int)));
   assert(data->tab = (int **) calloc(ncase, sizeof(int *)));
   for(i=0;i<ncase;i++) assert(data->tab[i] = (int *) calloc(ncase, sizeof(int)));
-  fill_tab(data->tab, *n);
+  assert(data->tab_use = (int **) calloc(ncase, sizeof(int *)));
+  for(i=0;i<ncase;i++) assert(data->tab_use[i] = (int *) calloc(*n, sizeof(int)));
+  fill_tab(data->tab, data->tab_use, *n);
 
   ct_decoy = 0;
   for(j=0;j<(data->N+2);j++) fscanf(fp, "%s",buf);
