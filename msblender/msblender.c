@@ -44,8 +44,9 @@ int main(int argc, char **argv) {
   T = gsl_rng_default;
   r = gsl_rng_alloc(T);
 
-  if (argc != 4) {
+  if (!(argc == 2 || argc == 4)) {
     fprintf(stderr, "usage: msblender [data] [ncompPos] [ncompNeg]\n");
+    fprintf(stderr, "usage: msblender [data] (default: ncompPos=2, ncompNeg=2)\n");
     return 1;
   }
   FILE *fp = fopen(argv[1], "r");
@@ -53,8 +54,10 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Data file %s does not exist.\n", argv[1]);
     return 1; 
   }
-  par.ncomp = atoi(argv[2]);
-  par.ncomp0 = atoi(argv[3]);
+  if(argc >= 3) par.ncomp = atoi(argv[2]);
+  else par.ncomp = 2;
+  if(argc >= 4) par.ncomp0 = atoi(argv[3]);
+  else par.ncomp0 = 2;
   niter = 30;
 
   p = nrow(fp) - 1;

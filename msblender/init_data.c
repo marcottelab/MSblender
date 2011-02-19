@@ -16,6 +16,7 @@ void fill_tab(int **tab, int **tab_use, int n) {
   int i, j, k, ncase;
   int div, res;
   int pos, neg;
+  int mypos, myneg;
   ncase = pow(2,n);
   int use[ncase][n];
   for(i=0;i<ncase;i++) {
@@ -38,6 +39,12 @@ void fill_tab(int **tab, int **tab_use, int n) {
   }
 
   for(i=1;i<ncase;i++) {
+    mypos = 0;
+    myneg = 0;
+    for(k=0;k<n;k++) {
+      if(use[i][k] == 1) mypos++;
+      else myneg++;
+    }
     for(j=1;j<ncase;j++) {
       pos = 0;
       for(k=0;k<n;k++) { 

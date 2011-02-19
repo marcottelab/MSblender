@@ -348,7 +348,7 @@ void EM1(PAR *par, DATA *data) {
   for(j=0;j<par->N;j++) {
     for(k=0;k<par->ncomp0;k++) par->zFsum[k] = 0.0;
     for(i=0;i<data->P;i++) {    
-      if(1) {
+      if(data->is_decoy[i]) {
         x[j] = gsl_matrix_get(data->X, i, j);    
         if(x[j] != _missval_) {
           for(k=0;k<par->ncomp0 ;k++) if(condF[j][k] > 0.0) lik[k] = 0.0;
@@ -443,11 +443,13 @@ void EM1(PAR *par, DATA *data) {
   }
 
   par->pi = 0.0;
+  k = 0;
   for(i=0;i<data->ncase;i++) par->pi_case[i] = 0.0;
   for(i=0;i<data->ncase;i++) km[i] = 1.0;
   for(i=0;i<data->P;i++) {
     if(data->is_decoy[i] ) {}
     else {
+      k++;
       par->pi += par->z[i];
       m = data->app[i];
       for(l=1;l<data->ncase;l++) {
@@ -472,10 +474,14 @@ void EM1(PAR *par, DATA *data) {
 
 void EM2(PAR *par, DATA *data) {
   int i,j,k, s, t;    
-  double maxp, sump, tmp, tmpprod;
+  double maxp, sump, tmp;
+  double tmpprod, tmpprodX, tmpprodY, tmpprodXY;
   double lik[par->ncomp];
   double liksum[par->ncomp][data->N];
   double liksum2[par->ncomp][data->N][data->N];
+  double varX[par->ncomp][data->N][data->N];
+  double varY[par->ncomp][data->N][data->N];
+  double varXY[par->ncomp][data->N][data->N];
   double x[data->N];  
 
   double condT[par->ncomp];
@@ -505,7 +511,7 @@ void EM2(PAR *par, DATA *data) {
     for(j=0;j<data->N;j++) liksum[i][j] = 0.0;
   }
   for(i=0;i<data->P;i++) {
-    if(data->is_decoy[i] == 0) {
+    if(data->is_complete[i]) {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
         for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
@@ -546,11 +552,14 @@ void EM2(PAR *par, DATA *data) {
     for(s=0;s<data->N;s++) {
       for(t=0;t<data->N;t++) {
         liksum2[i][s][t] = 0.0;
+        varX[i][s][t] = 0.0;
+        varY[i][s][t] = 0.0;
+        varXY[i][s][t] = 0.0;
       }
     }
   }
   for(i=0;i<data->P;i++) {
-    if(data->is_decoy[i] == 0)  {
+    if(data->is_complete[i])  {
       for(k=0;k<par->ncomp ;k++) {
         for(j=0;j<data->N;j++) x[j] = gsl_matrix_get(data->X, i, j);    
         for(j=0;j<data->N;j++) if(x[j] != _missval_ && k == posMode[j] ) x[j] = GSL_MIN(x[j], gsl_vector_get(par->MuT[k],j));    
@@ -577,7 +586,14 @@ void EM2(PAR *par, DATA *data) {
               if(x[s] != _missval_ && x[t] != _missval_) {
                 tmp = gsl_matrix_get(Sigma[k], s, t);
                 tmpprod = (gsl_matrix_get(data->X, i, s) - gsl_vector_get(par->MuT[k],s)) * (gsl_matrix_get(data->X, i, t) - gsl_vector_get(par->MuT[k],t));
-                gsl_matrix_set(Sigma[k], s, t, tmp + lik[k] * par->z[i] * tmpprod);
+                gsl_matrix_set(Sigma[k], s, t, tmp + lik[k] * par->z[i] * tmpprod); 
+
+                tmpprodX = (gsl_matrix_get(data->X, i, s) - gsl_vector_get(par->MuT[k],s)) * (gsl_matrix_get(data->X, i, s) - gsl_vector_get(par->MuT[k],s));
+                tmpprodY = (gsl_matrix_get(data->X, i, t) - gsl_vector_get(par->MuT[k],t)) * (gsl_matrix_get(data->X, i, t) - gsl_vector_get(par->MuT[k],t));
+                tmpprodXY = (gsl_matrix_get(data->X, i, s) - gsl_vector_get(par->MuT[k],s)) * (gsl_matrix_get(data->X, i, t) - gsl_vector_get(par->MuT[k],t));
+                varX[k][s][t] += tmpprodX * par->z[i] * lik[k];
+                varY[k][s][t] += tmpprodY * par->z[i] * lik[k];
+                varXY[k][s][t] += tmpprodXY * par->z[i] * lik[k];
               }
             }
           }
@@ -585,12 +601,27 @@ void EM2(PAR *par, DATA *data) {
       }
     }
   }
+
   for(k=0;k<par->ncomp ;k++) {
     if(condT[k] > 0.0) {
       for(s=0;s<data->N;s++) {
+          tmp = gsl_matrix_get(Sigma[k], s, s);
+          gsl_matrix_set(par->SigmaT[k], s, s, tmp / liksum2[k][s][s]);
+      }
+      for(s=0;s<data->N;s++) {
         for(t=0;t<data->N;t++) {
-          tmp = gsl_matrix_get(Sigma[k], s, t);
-          gsl_matrix_set(par->SigmaT[k], s, t, tmp / liksum2[k][s][t]);
+          varX[k][s][t] /= liksum2[k][s][t];
+          varY[k][s][t] /= liksum2[k][s][t];
+          varXY[k][s][t] /= liksum2[k][s][t];
+        }
+      }
+      for(s=0;s<data->N;s++) {
+        for(t=0;t<data->N;t++) {
+          if(s!=t) {
+            tmp = gsl_matrix_get(par->SigmaT[k], s, s) * gsl_matrix_get(par->SigmaT[k], t, t);
+            tmp = pow(tmp, 0.5);
+            gsl_matrix_set(par->SigmaT[k], s, t, tmp * varXY[k][s][t] / pow(varX[k][s][t] * varY[k][s][t], 0.5));
+          }
         }
       }
     }
@@ -631,7 +662,7 @@ void EM3(PAR *par, DATA *data) {
       }
     }
     for(i=0;i<data->P;i++) {
-      if(data->is_decoy[i]) {
+      if(1) {
         x = gsl_matrix_get(data->X, i, j);
         if(x != _missval_) {
           for(k=0;k<par->ncomp0 ;k++) {
@@ -663,7 +694,7 @@ void EM3(PAR *par, DATA *data) {
       if(condF[j][k] > 0.0) Sigma[k] = 0.0;
     }
     for(i=0;i<data->P;i++) {
-      if(data->is_decoy[i]) {
+      if(1) {
         x = gsl_matrix_get(data->X, i, j);
         if(x != _missval_) {
           for(k=0;k<par->ncomp0 ;k++) {
@@ -863,15 +894,33 @@ void mvEM(PAR *par, DATA *data, int niter, const gsl_rng *r) {
   for(i=0;i<niter;i++) {
     if(i==0) oldlik = GSL_NEGINF;
     else oldlik = newlik;
+
     oldpi = newpi;
+
     EM1(par, data);
     EM2(par, data);
-    EM3(par, data);    
+    EM3(par, data);
+    
     newpi = par->pi;
     newlik = logLik(par, data);
-    fprintf(stdout, "%d ", i+1);
+
+    fprintf(stdout, "%d\t%.6f\t%.4f\n", i+1, newlik, par->pi);
+   
+    fprintf(stdout, "TRUE\n");
+    int k;
+    for(k=0;k<par->ncomp;k++) {
+      fprintf(stdout, "%.3f\n", par->piT[k]);
+      printVector(par->MuT[k], par->N);
+      fprintf(stdout, "\n");
+      printMatrix(par->SigmaT[k], par->N);
+      fprintf(stdout, "\n");
+    }
+    fprintf(stdout, "\n"); 
+
+
+    // fprintf(stdout, "%d ", i+1);
   } 
-  fprintf(stdout, "\n");
+  // fprintf(stdout, "\n");
   
   SCORE(par, data);
 }
