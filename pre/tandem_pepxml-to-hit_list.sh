@@ -5,5 +5,5 @@ echo $SCRIPT
 for OUT in $(ls *pepxml)
 do
   $MAKE_HIT_LIST $OUT
-  $SELECT_BEST $OUT".xcorr_hit_list"
+  $SELECT_BEST $OUT".logE_hit_list"
 done
