@@ -33,7 +33,7 @@ for line in f_in:
     charge = int(tokens[5])
     precursor_mz = float(tokens[3])
     massdiff = float(tokens[4])*1e-6*(precursor_mz-18)
-    SpecProb = float(tokens[-1]) 
+    SpecProb = float(tokens[-2]) 
     sp_id = '%s.%05d.%05d.%d'%(filename,scan_id,scan_id,charge)
     f_out.write("%s\t%d\t%f\t%f\t%s\t%s\t-1\t%f\n"%(sp_id,charge,precursor_mz,massdiff,pep_seq,prot_id,-1.0*math.log10(SpecProb)))
 f_in.close()
