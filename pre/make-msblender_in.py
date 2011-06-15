@@ -11,7 +11,8 @@ search_median = dict()
 search_stdev = dict()
 
 search_engine_list = []
-f_conf = open(sys.argv[1],'r')
+filename_conf = sys.argv[1]
+f_conf = open(filename_conf,'r')
 for line in f_conf:
     if( line.startswith('#') ):
         continue
@@ -67,19 +68,30 @@ f_conf.close()
 
 search_engine_list = sorted(search_engine_list)
 
-print "sp_pep_id\tdecoy\t%s"%("\t".join(["%s_score"%x for x in search_engine_list]))
+filename_out = filename_conf.replace('.conf','')
+filename_prot_list = filename_out +'.prot_list'
+filename_out += '.msblender_in'
+
+f_out = open(filename_out,'w')
+f_prot_list = open(filename_prot_list,'w')
+f_out.write("sp_pep_id\tdecoy\t%s\n"%("\t".join(["%s_score"%x for x in search_engine_list])))
 for sp_pep_id in sorted(sp2hit.keys()):
     output_list = []
     is_decoy = 0
+    prot_list = []
     for tmp_search_engine_name in search_engine_list:
         if( sp2hit[sp_pep_id].has_key( tmp_search_engine_name ) ):
             tmp_score = sp2hit[sp_pep_id][tmp_search_engine_name]['score']
             tmp_score = (tmp_score - search_median[tmp_search_engine_name])/search_stdev[tmp_search_engine_name]
             output_list.append( "%f"%tmp_score )
+            prot_list.append(sp2hit[sp_pep_id][tmp_search_engine_name]['prot_id'])
             for tmp_decoy_tag in decoy_tag_list:
                 if( sp2hit[sp_pep_id][tmp_search_engine_name]['prot_id'].startswith(tmp_decoy_tag) ):
                     is_decoy = 1
         else:
             output_list.append( 'NA' )
-
-    print "%s\t%d\t%s"%(sp_pep_id, is_decoy, '\t'.join(output_list) )
+    prot_list = list(set(prot_list))
+    f_prot_list.write("%s\t%s\n"%(sp_pep_id,','.join(prot_list)))
+    f_out.write("%s\t%d\t%s\n"%(sp_pep_id, is_decoy, '\t'.join(output_list) ))
+f_out.close()
+f_prot_list.close()
