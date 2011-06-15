@@ -19,7 +19,7 @@ if( not os.access(filename_pepxml,os.R_OK) ):
 PSM = pepxml.parse_by_filename(filename_pepxml)
 
 filename_out = filename_pepxml
-filename_out = re.sub('.pepxml$','',filename_out)
+#filename_out = re.sub('.pepxml$','',filename_out)
 filename_out += '.xcorr_hit_list'
 sys.stderr.write("Write %s ... \n"%filename_out)
 f_out = open(filename_out,'w')
