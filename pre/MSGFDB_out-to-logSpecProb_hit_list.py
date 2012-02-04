@@ -21,21 +21,37 @@ f_out = open(filename_out,'w')
 f_out.write("#input : %s\n"%filename_in)
 f_out.write("#Spectrum_id\tCharge\tPrecursorMz\tMassDiff\tPeptide\tProtein\tMissedCleavages\tScore(-log10[SpecProb])\n")
 f_in = open(filename_in,'r')
+header_list = f_in.readline().strip().lstrip('#').split("\t")
+filename_idx = header_list.index('SpecFile')
+scan_id_idx = header_list.index('Scan#')
+pep_idx = header_list.index('Peptide')
+prot_idx = header_list.index('Protein')
+charge_idx = header_list.index('Charge')
+precursor_mz_idx = header_list.index('Precursor')
+pmerror_idx = header_list.index('PMError(ppm)')
+spec_prob_idx = header_list.index('SpecProb')
+
 for line in f_in:
     if( line.startswith('#') ):
         continue
     tokens = line.strip().split("\t")
-    filename = os.path.basename(tokens[0]).split('.')[0]
-    scan_id = int(tokens[1])
+    filename = os.path.basename(tokens[filename_idx]).split('.')[0]
+    scan_id = int(tokens[scan_id_idx])
 
-    pep_seq = tokens[6].split('.')[1].upper()
-    prot_id = tokens[7].replace('XXX.','xf_')
-    charge = int(tokens[5])
-    precursor_mz = float(tokens[3])
-    massdiff = float(tokens[4])*1e-6*(precursor_mz-18)
-    SpecProb = float(tokens[-2]) 
+    pep_seq = tokens[pep_idx].split('.')[1].upper()
+    prot_id = tokens[prot_idx].replace('XXX.','xf_')
+    charge = int(tokens[charge_idx])
+    precursor_mz = float(tokens[precursor_mz_idx])
+    massdiff = float(tokens[pmerror_idx])*1e-6*(precursor_mz-18)
+    SpecProb = float(tokens[spec_prob_idx]) 
+    #logSpecProb = 50
+    #if( SpecProb != 0 ):
+    #    logSpecProb = math.log10(SpecProb)*-1.0
+    logSpecProb = 50
+    if( SpecProb != 0 ):
+        logSpecProb = math.log10(SpecProb)*-1.0
     sp_id = '%s.%05d.%05d.%d'%(filename,scan_id,scan_id,charge)
-    f_out.write("%s\t%d\t%f\t%f\t%s\t%s\t-1\t%f\n"%(sp_id,charge,precursor_mz,massdiff,pep_seq,prot_id,-1.0*math.log10(SpecProb)))
+    f_out.write("%s\t%d\t%f\t%f\t%s\t%s\t-1\t%f\n"%(sp_id,charge,precursor_mz,massdiff,pep_seq,prot_id,logSpecProb))
 f_in.close()
 f_out.close()
 sys.stderr.write("Done\n")
