@@ -44,6 +44,11 @@ class pepxml_parser(xml.sax.ContentHandler):
                 self.search_hit['spscore'] = float(attr['value'])
             if(attr['name'] == 'deltacn'):
                 self.search_hit['deltacn'] = float(attr['value'])
+            ## Crux
+            if(attr['name'] == 'xcorr_score'):
+                self.search_hit['xcorr'] = float(attr['value'])
+            if(attr['name'] == 'delta_cn'):
+                self.search_hit['deltacn'] = float(attr['value'])
             ## X!Tandem
             if(attr['name'] == 'hyperscore'):
                 self.search_hit['hyperscore'] = float(attr['value'])
