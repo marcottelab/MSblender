@@ -4,7 +4,7 @@ import sys
 import math
 
 usage_mesg = 'Usage: make-msblender_in.py <msblender_in.conf file>'
-decoy_tag_list = ['xf_','XXX.','rev_']
+decoy_tag_list = ['xf_','XXX.','rev_','rv_']
 
 sp2hit = dict()
 search_median = dict()
