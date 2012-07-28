@@ -43,7 +43,8 @@ for spectrum_id in PSM.keys():
         if( tmp_hit['expect'] < best_expect ):
             best_pvalue = tmp_hit['pvalue']
             best_peptide = tmp_hit['peptide']
-            best_protein = tmp_hit['protein_descr']
+            #best_protein = tmp_hit['protein_descr']
+            best_protein = tmp_hit['protein']
             best_expect = tmp_hit['expect']
             missed_cleavages = tmp_hit['missed_cleavages']
             massdiff = tmp_hit['massdiff']
