@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 import os 
 import sys
 import math
@@ -72,6 +72,7 @@ filename_out = filename_conf.replace('.conf','')
 filename_prot_list = filename_out +'.prot_list'
 filename_out += '.msblender_in'
 
+freq = dict()
 f_out = open(filename_out,'w')
 f_prot_list = open(filename_prot_list,'w')
 f_out.write("sp_pep_id\tdecoy\t%s\n"%("\t".join(["%s_score"%x for x in search_engine_list])))
@@ -93,5 +94,17 @@ for sp_pep_id in sorted(sp2hit.keys()):
     prot_list = list(set(prot_list))
     f_prot_list.write("%s\t%s\n"%(sp_pep_id,','.join(prot_list)))
     f_out.write("%s\t%d\t%s\n"%(sp_pep_id, is_decoy, '\t'.join(output_list) ))
+    count_nonNA = len(output_list) - output_list.count('NA')
+    if( not freq.has_key(count_nonNA) ):
+        freq[count_nonNA] = []
+    freq[count_nonNA].append(sp_pep_id)
 f_out.close()
 f_prot_list.close()
+
+for count_nonNA in sorted(freq.keys()):
+    sys.stderr.write("%d - %d\n"%(count_nonNA, len(freq[count_nonNA])))
+
+max_nonNA = max(freq.keys())
+f_max = open('%s.overlap_%d_psm.txt'%(filename_conf.replace('.conf',''),max_nonNA),'w')
+f_max.write('%s\n'%('\n'.join(sorted(freq[max_nonNA]))))
+f_max.close()
