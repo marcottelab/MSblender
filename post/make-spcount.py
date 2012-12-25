@@ -27,7 +27,8 @@ for line in f_prot_list:
     tokens = line.strip().split("\t")
     if( len(tokens) != 2 ):
         print "Error in prot_list:",tokens
-        sys.exit(1)
+        continue
+        #sys.exit(1)
     psm_id = tokens[0]
     psm_tokens = psm_id.split('.')[:-1]
     sp_id = '%s.%s'%(psm_tokens[0],psm_tokens[1])
