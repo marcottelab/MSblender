@@ -50,7 +50,7 @@ for tmp_psm in sorted(psm_mvScore.keys(),key=psm_mvScore.get,reverse=True):
             tmp_pep = tmp_psm.split('.')[-1]
             if( not pep_count.has_key(tmp_pep) ):
                 pep_count[tmp_pep] = dict()
-            if( pep_count[tmp_pep].has_key(sample_name) ):
+            if( not pep_count[tmp_pep].has_key(sample_name) ):
                 pep_count[tmp_pep][sample_name] = 0
             pep_count[tmp_pep][sample_name] += 1
         else:
@@ -63,6 +63,7 @@ sample_list = sorted(list(set(sample_list)))
 
 sys.stderr.write('Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
 f_count = open('%s.pep_count_FDR0005'%filename_base,'w')
+f_count.write('#Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
 f_count.write('#PepSeq\tTotalCount\t%s\n'%('\t'.join(sample_list)))
 for tmp_pep in sorted(pep_count.keys(),key=pep_count.get):
     out_list = []
