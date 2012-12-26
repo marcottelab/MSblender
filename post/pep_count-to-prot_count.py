@@ -8,6 +8,8 @@ filename_prot_list = sys.argv[2]
 pep_count = dict()
 f_pc = open(filename_pep_count,'r')
 for line in f_pc:
+    if( line.startswith('#') ):
+        continue
     tokens = line.strip().split()
     pep_count[ tokens[0] ] = int(tokens[1])
 f_pc.close()
@@ -16,6 +18,8 @@ pep2prot = dict()
 prot2pep = dict()
 f_pl = open(filename_prot_list,'r')
 for line in f_pl:
+    if( line.startswith('#') ):
+        continue
     tokens = line.strip().split("\t")
     pep_seq = tokens[0].split('.')[-1]
     if( pep_seq == '' ):
@@ -30,7 +34,7 @@ for line in f_pl:
         prot2pep[prot_id].append(pep_seq)
 f_pl.close()
 
-print "ProtID\tUnweighted\tWeighted\tUnique"
+print "#ProtID\tUnweighted\tWeighted\tUnique"
 for prot_id in sorted(prot2pep.keys()):
     if( prot_id.startswith('rv_') ):
         continue
@@ -38,7 +42,7 @@ for prot_id in sorted(prot2pep.keys()):
     unweighted = 0
     weighted = 0
     unique = 0
-    for pep_seq in prot2pep[prot_id]:    
+    for pep_seq in list(set(prot2pep[prot_id])):
         if( not pep_count.has_key(pep_seq) ):
             continue
         unweighted += pep_count[pep_seq]
