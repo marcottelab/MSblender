@@ -6,6 +6,7 @@ if len(sys.argv) < 3:
     sys.exit("usage: python msblender_out-to...py filename FDR_cutoff{0.01,0,005}") 
 filename_mb_out = sys.argv[1]
 FDR_cutoff = float(sys.argv[2])
+FDR_string = sys.argv[2].replace('.','')
 print "FDR cutoff", FDR_cutoff
 
 filename_base = filename_mb_out.replace('.msblender_in','').replace('.msblender_out','')
@@ -29,7 +30,7 @@ count_D = 0
 D_pep_count = dict()
 pep_count = dict()
 sample_list = []
-f_log = open('%s.pep_count_FDR001.log'%filename_base,'w')
+f_log = open('%s.pep_count_FDR%s.log'%(filename_base,FDR_string),'w')
 f_log.write('PSM_id\tFDR\tmvScore\n')
 for tmp_psm in sorted(psm_mvScore.keys(),key=psm_mvScore.get,reverse=True):
     if( psm_TD[tmp_psm] == 'D' ):
@@ -65,7 +66,7 @@ f_log.close()
 sample_list = sorted(list(set(sample_list)))
 
 sys.stderr.write('Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
-f_count = open('%s.pep_count_FDR001'%filename_base,'w')
+f_count = open('%s.pep_count_FDR%s'%(filename_base, FDR_string),'w')
 f_count.write('#Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
 f_count.write('#PepSeq\tTotalCount\t%s\n'%('\t'.join(sample_list)))
 for tmp_pep in sorted(pep_count.keys(),key=pep_count.get):
