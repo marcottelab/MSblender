@@ -2,8 +2,11 @@
 import os
 import sys
 
+if len(sys.argv) < 3:
+    sys.exit("usage: python msblender_out-to...py filename FDR_cutoff{0.01,0,005}") 
 filename_mb_out = sys.argv[1]
-FDR_cutoff = 0.005 
+FDR_cutoff = float(sys.argv[2])
+print "FDR cutoff", FDR_cutoff
 
 filename_base = filename_mb_out.replace('.msblender_in','').replace('.msblender_out','')
 
@@ -26,7 +29,7 @@ count_D = 0
 D_pep_count = dict()
 pep_count = dict()
 sample_list = []
-f_log = open('%s.pep_count_FDR0005.log'%filename_base,'w')
+f_log = open('%s.pep_count_FDR001.log'%filename_base,'w')
 f_log.write('PSM_id\tFDR\tmvScore\n')
 for tmp_psm in sorted(psm_mvScore.keys(),key=psm_mvScore.get,reverse=True):
     if( psm_TD[tmp_psm] == 'D' ):
@@ -42,12 +45,12 @@ for tmp_psm in sorted(psm_mvScore.keys(),key=psm_mvScore.get,reverse=True):
         tmp_FDR = float(count_D)/(count_T+count_D)
     
     if( tmp_FDR < FDR_cutoff ):
+        tmp_pep = tmp_psm.split('.')[-1]
         if( psm_TD[tmp_psm] == 'F' ):
             f_log.write('%s\t%.3f\t%.2f\n'%(tmp_psm,tmp_FDR,psm_mvScore[tmp_psm]))
             
             sample_name = tmp_psm.split('.')[0]
             sample_list.append(sample_name)
-            tmp_pep = tmp_psm.split('.')[-1]
             if( not pep_count.has_key(tmp_pep) ):
                 pep_count[tmp_pep] = dict()
             if( not pep_count[tmp_pep].has_key(sample_name) ):
@@ -62,7 +65,7 @@ f_log.close()
 sample_list = sorted(list(set(sample_list)))
 
 sys.stderr.write('Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
-f_count = open('%s.pep_count_FDR0005'%filename_base,'w')
+f_count = open('%s.pep_count_FDR001'%filename_base,'w')
 f_count.write('#Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
 f_count.write('#PepSeq\tTotalCount\t%s\n'%('\t'.join(sample_list)))
 for tmp_pep in sorted(pep_count.keys(),key=pep_count.get):
@@ -74,6 +77,5 @@ for tmp_pep in sorted(pep_count.keys(),key=pep_count.get):
             total_count += pep_count[tmp_pep][tmp_sample]
         else:
             out_list.append('0')
-
     f_count.write('%s\t%d\t%s\n'%(tmp_pep,total_count,'\t'.join(out_list)))
 f_count.close()
