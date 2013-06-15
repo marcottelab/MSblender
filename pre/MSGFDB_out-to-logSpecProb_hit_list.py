@@ -28,7 +28,10 @@ pep_idx = header_list.index('Peptide')
 prot_idx = header_list.index('Protein')
 charge_idx = header_list.index('Charge')
 precursor_mz_idx = header_list.index('Precursor')
-pmerror_idx = header_list.index('PMError(ppm)')
+if( 'PMError(ppm)' in header_list ):
+    pmerror_idx = header_list.index('PMError(ppm)')
+if( 'PMError(Da)' in header_list ):
+    pmerror_idx = header_list.index('PMError(Da)')
 spec_prob_idx = header_list.index('SpecProb')
 
 for line in f_in:
