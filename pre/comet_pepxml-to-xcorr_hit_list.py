@@ -41,5 +41,7 @@ for spectrum_id in PSM.keys():
             best_deltacn = tmp_hit['deltacn']
             missed_cleavages = tmp_hit['missed_cleavages']
             massdiff = tmp_hit['massdiff']
+    if( best_peptide == '' ):
+        continue
     f_out.write("%s\t%s\t%f\t%f\t%s\t%s\t%d\t%f\n"%(spectrum_id,charge,precursor_mz,massdiff,best_peptide,best_protein,missed_cleavages,best_xcorr))
 f_out.close()
