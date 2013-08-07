@@ -2,7 +2,7 @@
 # Comet MS/MS search engine parameters file.
 # Everything following the '#' symbol is treated as a comment.
 
-database_name = /home/00992/linusben/scratch/HumanCells/DB.prot/HUMAN_ens69_prot_combined.fa
+database_name = /your/db/fasta/file
 
 decoy_search = 0                       # 0=no (default), 1=concatenated search, 2=separate search
 
