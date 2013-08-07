@@ -13,7 +13,8 @@ class pepxml_parser(xml.sax.ContentHandler):
         if( len(self.element_array) == 3 and name == 'spectrum_query' ):
             self.is_spectrum_query = True
             sp_tokens = attr['spectrum'].split('.')
-            self.spectrum_id = '%s.%05d.%05d.%d'%(sp_tokens[0],int(sp_tokens[1]),int(sp_tokens[2]),int(sp_tokens[3]))
+            self.spectrum_id = '%s.%05d.%05d.%d'%(sp_tokens[0],int(sp_tokens[1]),int(sp_tokens[2]),int(sp_tokens[-1]))
+
             if( not self.PSM.has_key(self.spectrum_id) ):
                 self.PSM[self.spectrum_id] = dict()
                 self.PSM[self.spectrum_id]['search_hit'] = []
@@ -68,6 +69,12 @@ class pepxml_parser(xml.sax.ContentHandler):
                 self.search_hit['fscore'] = float(attr['value'])
             if(attr['name'] == 'deltascore'):
                 self.search_hit['deltascore'] = float(attr['value'])
+            ## Mascot
+            if(attr['name'] == 'ionscore'):
+                self.search_hit['ionscore'] = float(attr['value'])
+            if(attr['name'] == 'identityscore'):
+                self.search_hit['identityscore'] = float(attr['value'])
+
             ## MyriMatch
             if(attr['name'] == 'mvh'):
                 self.search_hit['mvh'] = float(attr['value'])
@@ -81,6 +88,7 @@ class pepxml_parser(xml.sax.ContentHandler):
                 self.search_hit['newMZFidelity'] = float(attr['value'])
             if(attr['name'] == 'mzMAE'):
                 self.search_hit['mzMAE'] = float(attr['value'])
+
             ## DirecTag-TagRecon
             if(attr['name'] == 'numPTMs'):
                 self.search_hit['numPTMs'] = int(attr['value'])
