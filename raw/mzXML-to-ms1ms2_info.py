@@ -3,12 +3,12 @@ import os
 import sys
 
 filename_mzXML = sys.argv[1]
-
+    
 scan_id = 0
 scan_info = dict()
 f_mzXML = open(filename_mzXML,'r')
 for line in f_mzXML:
-    line = line.strip()
+    line = line.strip().rstrip('>')
     if( line.startswith('<scan ') ):
         scan_id = int(line.replace('"','').split('=')[1])
         if( not scan_info.has_key(scan_id) ):
@@ -31,6 +31,15 @@ for line in f_mzXML:
                 scan_info[scan_id]['precursor_charge'] = int(tmp.replace('"','').split('=')[1])
         scan_info[scan_id]['precursor_mz'] = float(line.split('>')[1].split('<')[0])
 f_mzXML.close()
+
+## Some mzXML do not have precirsorScanNum
+ms1_id = 0
+for tmp_scan_id in sorted(scan_info.keys()):
+    if( scan_info[tmp_scan_id]['msLevel'] == 1 ):
+        ms1_id = tmp_scan_id
+    else:
+        scan_info[ms1_id]['ms2_count'] += 1
+        scan_info[tmp_scan_id]['precursor_id'] = ms1_id
 
 def get_param(args, keyword):
     if( args.has_key(keyword) ):
