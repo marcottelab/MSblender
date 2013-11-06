@@ -4,7 +4,7 @@ import sys
 import math
 
 filename_ms2 = sys.argv[1]
-filename_base = filename_ms2.replace('.ms1_info','').replace('.mzXML','').replace('.mzXML','')
+filename_base = filename_ms2.replace('.ms2_info','').replace('.mzML','').replace('.mzXML','')
 
 rt_list = []
 pmz_list = []

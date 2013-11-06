@@ -4,7 +4,7 @@ import sys
 import math
 
 filename_ms1 = sys.argv[1]
-filename_base = filename_ms1.replace('.ms1_info','').replace('.mzXML','').replace('.mzXML','')
+filename_base = filename_ms1.replace('.ms1_info','').replace('.mzML','').replace('.mzXML','')
 
 rt2ms2 = dict()
 rt2tot_ion = dict()
