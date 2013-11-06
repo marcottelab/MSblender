@@ -11,7 +11,7 @@ pmz_list = []
 tot_ion_list = []
 
 charge_tag_list = ['+0','+1','+2','+3','+4','>+4']
-charge_tag_color = {'+0':'grey','+1':'yellow','+2':'red','+3':'blue','+4':'green','>+4':'magenta'}
+charge_tag_color = {'+0':'grey','+1':'orange','+2':'red','+3':'blue','+4':'green','>+4':'magenta'}
 
 rt2pmz = dict()
 rt2tot_ion = dict()
@@ -56,9 +56,11 @@ max_tot_ion = int(max(tot_ion_list))
 tot_ion_step = [x*0.1 for x in range(0, (max_tot_ion+1)*10)]
 
 ## Cleanup
+new_charge_tag_list = []
 for tmp_charge_tag in charge_tag_list:
-    if( charge_tag_count[tmp_charge_tag] == 0 ):
-        charge_tag_list.remove(tmp_charge_tag)
+    if( charge_tag_count[tmp_charge_tag] != 0 ):
+        new_charge_tag_list.append(tmp_charge_tag)
+charge_tag_list = new_charge_tag_list
 
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
