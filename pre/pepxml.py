@@ -13,7 +13,7 @@ class pepxml_parser(xml.sax.ContentHandler):
         if( len(self.element_array) == 3 and name == 'spectrum_query' ):
             self.is_spectrum_query = True
             sp_tokens = attr['spectrum'].split('.')
-            self.spectrum_id = '%s.%05d.%05d.%d'%(sp_tokens[0],int(sp_tokens[1]),int(sp_tokens[2]),int(sp_tokens[-1]))
+            self.spectrum_id = '%s.%05d.%05d.%d'%(sp_tokens[0],int(sp_tokens[-3]),int(sp_tokens[-2]),int(sp_tokens[-1]))
 
             if( not self.PSM.has_key(self.spectrum_id) ):
                 self.PSM[self.spectrum_id] = dict()
