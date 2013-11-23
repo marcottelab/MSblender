@@ -33,7 +33,7 @@ for RAW in $(ls $SOURCE_DIR/*$RAW_TYPE)
 do
   MZID=$(basename $RAW)
   MZID=${MZID/.$RAW_TYPE/}"."$DBNAME".MSGF+.mzid"
-  #time java -Xmx8000M -jar $MSGFplus_JAR -d $DB -s $RAW -o $MZID -t 20ppm -tda 0 -ntt $NTT -thread $THREAD
+  time java -Xmx8000M -jar $MSGFplus_JAR -d $DB -s $RAW -o $MZID -t 20ppm -tda 0 -ntt $NTT -thread $THREAD
   OUT=${MZID/.mzid/}".tsv"
   java -Xmx8000M -cp $MSGFplus_JAR edu.ucsd.msjava.ui.MzIDToTsv -i $MZID -o $OUT -unroll 0
 done
