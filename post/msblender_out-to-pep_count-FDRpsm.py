@@ -10,7 +10,7 @@ filename_mb_out = sys.argv[1]
 FDR_cutoff = float(sys.argv[2])
 FDR_string = sys.argv[2].replace('.','')
 
-error_model = 'eFDRpsm'
+error_model = 'mFDRpsm'
 error_model_list = ['eFDRpsm','mFDRpsm']
 if( len(sys.argv) == 4 and sys.argv[3] in error_model_list ):
     error_model = sys.argv[3]
