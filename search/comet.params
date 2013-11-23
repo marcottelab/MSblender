@@ -1,18 +1,17 @@
-# comet_version 2013.01 rev. 0
+# comet_version 2013.02 rev. 0
 # Comet MS/MS search engine parameters file.
 # Everything following the '#' symbol is treated as a comment.
 
-database_name = /your/db/fasta/file
-
+database_name = /some/path/db.fasta
 decoy_search = 0                       # 0=no (default), 1=concatenated search, 2=separate search
 
-num_threads = 8                        # 0=poll CPU to set num threads; else specify num threads directly (max 32)
+num_threads = 2                        # 0=poll CPU to set num threads; else specify num threads directly (max 64)
 
 #
 # masses
 #
-peptide_mass_tolerance = 3.00
-peptide_mass_units = 0                 # 0=amu, 1=mmu, 2=ppm
+peptide_mass_tolerance = 20.0
+peptide_mass_units = 2                 # 0=amu, 1=mmu, 2=ppm
 mass_type_parent = 1                   # 0=average masses, 1=monoisotopic masses
 mass_type_fragment = 1                 # 0=average masses, 1=monoisotopic masses
 precursor_tolerance_type = 0           # 0=MH+ (default), 1=precursor m/z
@@ -61,8 +60,9 @@ use_sparse_matrix = 0
 #
 output_sqtstream = 0                   # 0=no, 1=yes  write sqt to standard output
 output_sqtfile = 0                     # 0=no, 1=yes  write sqt file
-output_txtfile = 0                     # 0=no, 1=yes  write tab-delimited txt file
+output_txtfile = 1                     # 0=no, 1=yes  write tab-delimited txt file
 output_pepxmlfile = 1                  # 0=no, 1=yes  write pep.xml file
+output_pinxmlfile = 0                  # 0=no, 1=yes  write pin.xml file
 output_outfiles = 0                    # 0=no, 1=yes  write .out files
 print_expect_score = 1                 # 0=no, 1=yes to replace Sp with expect in out & sqt
 num_output_lines = 5                   # num peptide results to show
@@ -90,11 +90,12 @@ max_precursor_charge = 6               # set maximum precursor charge state to a
 nucleotide_reading_frame = 0           # 0=proteinDB, 1-6, 7=forward three, 8=reverse three, 9=all six
 clip_nterm_methionine = 0              # 0=leave sequences as-is; 1=also consider sequence w/o N-term methionine
 spectrum_batch_size = 0                # max. # of spectra to search at a time; 0 to search the entire scan range in one loop
+decoy_prefix = DECOY_                  # decoy entries are denoted by this string which is pre-pended to each protein accession
 
 #
 # spectral processing
 #
-minimum_peaks = 10                     # minimum num. of peaks in spectrum to search (default 10)
+minimum_peaks = 10                     # required minimum number of peaks in spectrum to search
 minimum_intensity = 0                  # minimum intensity value to read in
 remove_precursor_peak = 0              # 0=no, 1=yes, 2=all charge reduced precursor peaks (for ETD)
 remove_precursor_tolerance = 1.5       # +- Da tolerance for precursor removal
