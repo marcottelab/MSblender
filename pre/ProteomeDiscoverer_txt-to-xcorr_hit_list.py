@@ -4,7 +4,7 @@ import os
 import sys
 import re
 
-usage_mesg = 'Usage: %s.py <crux target.txt file>'%sys.argv[0]
+usage_mesg = 'Usage: %s.py <.txt file from PD>'%sys.argv[0]
 
 if( len(sys.argv) != 2 ):
     print usage_mesg
