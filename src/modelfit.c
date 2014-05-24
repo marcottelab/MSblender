@@ -924,6 +924,3 @@ void mvEM(PAR *par, DATA *data, int niter, const gsl_rng *r) {
   
   SCORE(par, data);
 }
-
-
-

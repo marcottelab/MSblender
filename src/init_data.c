@@ -133,8 +133,3 @@ void read_data(FILE *fp, DATA *data, int *p, int *n) {
 
 }
 
-
-
-
-
-
