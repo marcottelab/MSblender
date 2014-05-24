@@ -16,7 +16,7 @@ void writeResult(FILE *fp, PAR *par, DATA *data) {
       if(tmp != _missval_) fprintf(fp, "%.2f", tmp);
       fprintf(fp, "\t");
     }    
-    fprintf(fp, "%.3f\n", par->z[i]);
+    fprintf(fp, "%.6f\n", par->z[i]);
   }
 }
 
