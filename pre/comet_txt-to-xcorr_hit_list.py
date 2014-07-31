@@ -24,8 +24,13 @@ f_out.write("#txt: %s\n"%filename_txt)
 f_out.write("#Spectrum_id\tCharge\tPrecursorMass\tMassDiff\tPeptide\tProtein\tMissedCleavages\tScore(Xcorr)\n")
 
 f_txt = open(filename_txt,'r')
-f_txt.readline()
-f_txt.readline()
+tmp_log = f_txt.readline()
+headers = f_txt.readline().strip().split("\t")
+idx_exp_neutral_mass = headers.index('exp_neutral_mass')
+idx_calc_neutral_mass = headers.index('calc_neutral_mass')
+idx_xcorr = headers.index('xcorr')
+idx_peptide = headers.index('plain_peptide')
+idx_protein = headers.index('protein')
 for line in f_txt:
     tokens = line.strip().split("\t")
     ## Spectrum without hit
@@ -34,11 +39,12 @@ for line in f_txt:
     scan_id = int(tokens[0])
     charge = int(tokens[1])
     sp_id = '%s.%05d.%05d.%d'%(filename_base.split('.')[0],scan_id,scan_id,charge)
-    exp_neutral_mass = float(tokens[2])
-    calc_neutral_mass = float(tokens[3])
-    xcorr = float(tokens[5])
-    peptide = tokens[11]
-    protein = tokens[15]
+
+    exp_neutral_mass = float(tokens[idx_exp_neutral_mass])
+    calc_neutral_mass = float(tokens[idx_calc_neutral_mass])
+    xcorr = float(tokens[idx_xcorr])
+    peptide = tokens[idx_peptide]
+    protein = tokens[idx_protein]
     massdiff = exp_neutral_mass - calc_neutral_mass
     f_out.write("%s\t%d\t%f\t%f\t%s\t%s\t-1\t%f\n"%(sp_id,charge,exp_neutral_mass,massdiff,peptide,protein,xcorr))
 f_out.close()
