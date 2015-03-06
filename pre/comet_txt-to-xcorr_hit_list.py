@@ -32,7 +32,7 @@ idx_xcorr = headers.index('xcorr')
 idx_peptide = headers.index('plain_peptide')
 idx_protein = headers.index('protein')
 for line in f_txt:
-    tokens = line.strip().split("\t")
+    tokens = [x for x in line.strip().split("\t") if x != '']
     ## Spectrum without hit
     if( len(tokens) == 3 ):
         continue
@@ -45,6 +45,8 @@ for line in f_txt:
     xcorr = float(tokens[idx_xcorr])
     peptide = tokens[idx_peptide]
     protein = tokens[idx_protein]
+    print peptide, idx_peptide
+    print tokens
     massdiff = exp_neutral_mass - calc_neutral_mass
     f_out.write("%s\t%d\t%f\t%f\t%s\t%s\t-1\t%f\n"%(sp_id,charge,exp_neutral_mass,massdiff,peptide,protein,xcorr))
 f_out.close()
