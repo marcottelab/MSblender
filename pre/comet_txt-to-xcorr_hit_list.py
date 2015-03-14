@@ -45,8 +45,6 @@ for line in f_txt:
     xcorr = float(tokens[idx_xcorr])
     peptide = tokens[idx_peptide]
     protein = tokens[idx_protein]
-    print peptide, idx_peptide
-    print tokens
     massdiff = exp_neutral_mass - calc_neutral_mass
     f_out.write("%s\t%d\t%f\t%f\t%s\t%s\t-1\t%f\n"%(sp_id,charge,exp_neutral_mass,massdiff,peptide,protein,xcorr))
 f_out.close()
