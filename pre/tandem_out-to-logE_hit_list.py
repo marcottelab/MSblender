@@ -12,7 +12,8 @@ if( len(sys.argv) != 2 ):
     sys.exit(1)
 
 filename_in = sys.argv[1]
-filename_base = filename_in.split('.')[0]
+filename_base = filename_in.split('.')[1].split('/')[2]
+
 if( not os.access(filename_in,os.R_OK) ):
     print "%s is not accessible."%filename_in
     print usage_mesg
@@ -43,5 +44,6 @@ for spectrum_id in PSM.keys():
             missed_cleavages = tmp_hit['missed_cleavages']
             massdiff = tmp_hit['massdiff']
     spectrum_str = '%s.%05d.%05d.%d'%(filename_base,spectrum_id,spectrum_id,charge)
+   
     f_out.write("%s\t%s\t%f\t%f\t%s\t%s\t%d\t%f\n"%(spectrum_str,charge,precursor_mass,massdiff,best_peptide,best_protein,missed_cleavages,math.log10(best_expect)*-1))
 f_out.close()
