@@ -11,6 +11,7 @@ if( len(sys.argv) != 2 ):
     sys.exit(1)
 
 filename_pepxml = sys.argv[1]
+filename_base = filename_pepxml.split('.')[0]
 if( not os.access(filename_pepxml,os.R_OK) ):
     print "%s is not accessible."%filename_pepxml
     print usage_mesg
@@ -43,5 +44,7 @@ for spectrum_id in PSM.keys():
             massdiff = tmp_hit['massdiff']
     if( best_peptide == '' ):
         continue
+
+    #spectrum_str = '%05d.%05d.%d'%(spectrum_id,spectrum_id,charge)
     f_out.write("%s\t%s\t%f\t%f\t%s\t%s\t%d\t%f\n"%(spectrum_id,charge,precursor_mz,massdiff,best_peptide,best_protein,missed_cleavages,best_xcorr))
 f_out.close()
