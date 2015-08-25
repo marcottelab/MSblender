@@ -52,7 +52,7 @@ python /work/02609/kdrew/msblender/MSblender/post/msblender_out-to-pep_count-FDR
 wait
 
 
-python /work/02609/kdrew/msblender/MSblender/post/pep_count_with_fasta-to-prot_count.py ./*.pep_count_mFDRpsm001 /work/02609/kdrew/msblender/RiceL_IEX_uniprot/DB/uniprot-proteome%3AUP000000763_contam.combined.fasta
+python /work/02609/kdrew/msblender/MSblender/post/pep_count_with_fasta-to-prot_count.py ./*.pep_count_mFDRpsm001 XXX_DB_COMBINED_FASTA_TEMPLATE_XXX 
 wait
 
 mv msblender.* ${f%.tan*}-Results
