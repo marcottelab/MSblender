@@ -96,7 +96,7 @@
 		<note>values = yes|no</note>
 	<note type="input" label="output, performance">yes</note>
 		<note>values = yes|no</note>
-	<note type="input" label="output, spectra">yes</note>
+	<note type="input" label="output, spectra">no</note>
 		<note>values = yes|no</note>
 	<note type="input" label="output, histograms">no</note>
 		<note>values = yes|no</note>
