@@ -29,14 +29,19 @@ FASTAFILE=$2 #fasta protein database
 WORKDIR=$3
 OUTPUTDIR=$4
 #Use this if using searchgui exes and openMS binaries
-OPENMSDIR=$5
-SEARCHGUIDIR=$6
+SEARCHGUIDIR=$5
+
+
+####
+#Reserved for futue MS1 analysis
+#OPENMSDIR=$6
+###
 
 #Get location of this script
 this_script_loc="$(readlink -f ${BASH_SOURCE[0]})"
  
 ## Get pipeline folder location
-## Something like /work/MS1-quant-pipeline
+## Something like /work/MSblender
 PIPELINEDIR="$(dirname $this_script_loc)"
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PIPELINEDIR/lib
 echo $PIPELINEDIR
@@ -65,7 +70,13 @@ COMETEXE="${PIPELINEDIR}/exe/comet.linux.exe"
 
 #If using searchgui executables
 MSGFplus_JAR="$SEARCHGUIDIR/resources/MS-GF+/MSGFPlus.jar"
-OMSSAEXE="$SEARCHGUIDIR/resources/OMSSA/linux/omssacl"
+
+
+#####
+#Researved for MS1 future analysis
+#OMSSAEXE="$SEARCHGUIDIR/resources/OMSSA/linux/omssacl"
+#####
+
 #XTANDEMEXE="$SEARCHGUIDIR/resources/XTandem/linux/linux_64bit/tandem"
 XTANDEMEXE="${PIPELINEDIR}/extern/tandem.linux.exe"
 
@@ -79,10 +90,12 @@ mkdir -p $TANDEMDIR
 
 
 
+#######################################################  
+# Reserved for future MS1 analysis
 
 	
 # convert mzXML to mzML file as
-$OPENMSDIR/bin/FileConverter -in $1 -out $WORKDIR/${INPUTFILE}.mzML
+#$OPENMSDIR/bin/FileConverter -in $1 -out $WORKDIR/${INPUTFILE}.mzML
 
 
 #do database searches (MS2 identification)
@@ -93,15 +106,17 @@ $OPENMSDIR/bin/FileConverter -in $1 -out $WORKDIR/${INPUTFILE}.mzML
 	#need to export libs for myrimatch. how to fix this more perminently. 
 	#export LC_ALL=C
 
-
-	$OPENMSDIR/bin/OMSSAAdapter -in $WORKDIR/${INPUTFILE}.mzML -out $WORKDIR/${INPUTFILE}.OMSSA.idXML -database $FASTAFILE -fixed_modifications 'Carbamidomethyl (C)' -variable_modifications 'Oxidation (M)' -threads $THREADS -omssa_executable $OMSSAEXE
+	#$OPENMSDIR/bin/OMSSAAdapter -in $WORKDIR/${INPUTFILE}.mzML -out $WORKDIR/${INPUTFILE}.OMSSA.idXML -database $FASTAFILE -fixed_modifications 'Carbamidomethyl (C)' -variable_modifications 'Oxidation (M)' -threads $THREADS -omssa_executable $OMSSAEXE
 
 
         #Skipping doing MyriMatch    
         #SEARCHGUIDIR/bin/MyriMatchAdapter -in $WORKDIR/${INPUTFILE}.mzML -out $WORKDIR/${INPUTFILE}.Myri.idXML -database $FASTAFILE -fixed_modifications 'Carbamidomethyl (C)' -variable_modifications 'Oxidation (M)' -threads $THREADS -myrimatch_executable $MYRIMATCHEXE -debug 2 -log 'myrilog'
 
 
-        $OPENMSDIR/bin/XTandemAdapter -in $WORKDIR/${INPUTFILE}.mzML -out $WORKDIR/${INPUTFILE}.Xtandem.idXML -database $FASTAFILE -fixed_modifications 'Carbamidomethyl (C)' -variable_modifications 'Oxidation (M)' -threads $THREADS -xtandem_executable $XTANDEMEXE
+        #$OPENMSDIR/bin/XTandemAdapter -in $WORKDIR/${INPUTFILE}.mzML -out $WORKDIR/${INPUTFILE}.Xtandem.idXML -database $FASTAFILE -fixed_modifications 'Carbamidomethyl (C)' -variable_modifications 'Oxidation (M)' -threads $THREADS -xtandem_executable $XTANDEMEXE
+        #
+########################################################
+
 
 	#comet search
 
@@ -217,16 +232,21 @@ $OPENMSDIR/bin/FileConverter -in $1 -out $WORKDIR/${INPUTFILE}.mzML
 
 
 	mv ${INPUTFILE}.prot_count_mFDRpsm001 $OUTPUTDIR
-        mv ${INPUTFILE}*pep_count_mFDRpsm001 $OUTPUTDIR
-       
+	mv ${INPUTFILE}.prot_count_mFDRpsm001.group $OUTPUTDIR
+        mv ${INPUTFILE}.prot_count_mFDRpsm001.log $OUTPUTDIR
+        mv ${INPUTFILE}.prot_list $OUTPUTDIR
+        mv ${INPUTFILE}.pep_count_mFDRpsm001 $OUTPUTDIR
+        mv ${INPUTFILE}.pep_count_mFDRpsm001.log $OUTPUTDIR
+      
 
 	mv ${INPUTFILE}.* $WORKDIR/
 	
 
-	
- #clean up mzML file because it's huge
-rm $WORKDIR/${INPUTFILE}.mzML
-
+###
+#Reserved for future MS1 analysis	
+#clean up mzML file because it's huge
+#rm $WORKDIR/${INPUTFILE}.mzML
+####
 
 
 

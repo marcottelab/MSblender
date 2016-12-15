@@ -1,29 +1,61 @@
 # MSblender 
+MSblender: a probabilistic approach for integrating peptide identifications
+from multiple database search engines
+ 
+See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) information.
+ Citation
 
-   Modified from JRH MS1-Quant-Pipeline but minus any MS1 quantification
+    T. Kwon*, H. Choi*, C. Vogel, A.I. Nesvizhskii, and E.M. Marcotte, MSblender: a probabilistic approach for integrating peptide identifications from multiple database search engines. J. Proteome Research, 10(7): 2949–2958 (2011) Link 
+
+
+## About
+
+   This version is modified from JRH MS1-Quant-Pipeline but minus any MS1 quantification
    
-   This repo contains msblender MS2 analysis, helper scripts, and parameters used MS intepretation programs
+   This repo contains:
 
-   Available spectrum lookup programs XTandem, Comet, OMSSA, MS-GF+
+    -  msblender MS2 analysis
 
-   All external from SearchGUI except Xtandem
+    -  helper scripts
 
-   ### To do
+    -  accessory files and parameters used MS intepretation programs
+
+
+   Available search engines:
+
+    - X!Tandem
+
+    - Comet
+
+    - MS-GF+
+
+   All programs are external from SearchGUI except X!tandem
+
+  
+
+### To do
 
    - Myrimatch currently not working b/c of library issue 
   
    - Separate Xtandem from this repo
   
+   - Add on MS1 quantification
   
 
 
-# Instructions for running in marcottelab/run_msblender
+# How to run
 
-  run_msblender contains sample directory structure, instructions for how to run, and an example analysis
+   Instructions for running are in https://github.com/marcottelab/run_msblender
+
+   contains:
+ 
+    - sample directory structure
+ 
+    - instructions for how to run
+
+    - an example analysis
    
  
-
-
 #Compile msblender 
 
 Navigate to src/ and execute './compile'
@@ -36,8 +68,9 @@ This generates 'msblender' and 'msblender.h.gch
 
 #Building OpenMS on your own machine...oof
 
-### OpenMS with not build with default settings on TACC
-### May these instructions help some other poor soul
+### This will only be necessary for the upcoming MS1 quantification
+
+### OpenMS will not build with default settings on TACC
 
 Download tarball of OpenMS-2.0.0 or above
 
@@ -57,20 +90,24 @@ cd contrib-build
 Source of this: http://ftp.mi.fu-berlin.de/pub/OpenMS/release-documentation/html/install_linux.html
 
 
+Show  the available builds
 
-#This shows the available builds
-
+```
 cmake -DBUILD_TYPE=LIST ../contrib
+```
 
-try doing: cmake -DBUILD_TYPE=ALL ../contrib
+
+try doing: 
+
+```
+cmake -DBUILD_TYPE=ALL ../contrib
+```
 
 to install all at once, but I had to do each independently,
 
-and do module load for at least one
-
 libsvm wouldn't work, so I downloaded and build it independently
 
-example of the individual
+example of the individual installations
 ```
 cmake -DBUILD_TYPE=SEQAN ../contrib
 
@@ -79,7 +116,10 @@ cmake -DBUILD_TYPE=WILDMAGIC ../contrib
 cmake -DBUILD_TYPE=EIGEN ../contrib
 ```
 
-#Configuring
+Note: I originally did 'module load gsl' on TACC prior to running, but this isn't necessary apparently??
+
+
+## Configuring
 
 Back one level out of the OpenMS directory
 
