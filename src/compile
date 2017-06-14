@@ -1,5 +1,7 @@
 #! /bin/sh
+module load gsl/2.2.1
 gcc -Wall -I/opt/apps/gcc5_2/gsl/2.2.1/include/ -c *.c *.h
 gcc *.o -lgsl -L/opt/apps/gcc5_2/gsl/2.2.1/lib/ -lgslcblas -lm -o ./msblender
+
 rm -rf *.o
 
