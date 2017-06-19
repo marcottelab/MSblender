@@ -196,7 +196,7 @@ mkdir -p $TANDEMDIR
 	$MSBLENDER_BIN ${INPUTFILE}.msblender_in
 	
         echo -e "\nfilter-msblender"
-	python $PIPELINEDIR/msblender-scripts/filter-msblender.py ./${INPUTFILE}.msblender_in.msblender_out 001 > ./msblender.filter
+	python $PIPELINEDIR/msblender-scripts/filter-msblender.py ./${INPUTFILE}.msblender_in.msblender_out 001 > msblender.filter
 
 
         echo -e "\nmsblender_out-to-pep_count-FDRpsm"
