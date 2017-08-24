@@ -62,7 +62,13 @@ Navigate to src/ and execute './compile'
 
 You'll need GNU Scientific Library (gsl) and will likely have to modify the gsl path for your gsl version in src/compile -> 
 
+
+Change the two gcc commands to:
+
+
 gcc -Wall -I/opt/apps/gcc5_2/gsl/2.2.1/include/ -c *.c *.h
+
+
 gcc *.o -lgsl -L/opt/apps/gcc5_2/gsl/2.2.1/lib/ -lgslcblas -lm -o ./msblender
 
 This generates 'msblender' and 'msblender.h.gch
