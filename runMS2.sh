@@ -32,6 +32,43 @@ OUTPUTDIR=$4
 SEARCHGUIDIR=$5
 
 
+if [ ! -f "$1" ]
+    then
+    echo "mzXML $1 not found!"
+    exit 0
+fi
+if [ ! -f "$FASTAFILE" ]
+    then
+    echo "Fasta $FASTAFILE not found!"
+    exit 0
+fi
+
+if [ -z "$f" ]
+   then 
+   echo "mzXML $f not found"
+   exit 0
+fi
+
+if [ -z "$WORKDIR" ]
+   then 
+   echo "workdir $WORKDIR not found"
+   exit 0
+fi
+
+if [ -z "$OUTPUTDIR" ]
+   then 
+   echo "outputdir $OUTPUTDIR not found"
+   exit 0
+fi
+
+if [ -z "$SEARCHGUIDIR" ]
+   then 
+   echo "searchgui dir $SEARCHGUIDIR not found"
+   exit 0
+fi
+
+
+
 ####
 #Reserved for futue MS1 analysis
 #OPENMSDIR=$6
@@ -54,24 +91,45 @@ echo $MZXMLDIR
 MSBLENDER_BIN=$PIPELINEDIR/src/msblender
 #MSBLENDER_BIN=$WORK/MSblender/src/msblender
 
-
-#module load gsl
+if [ ! -f "$MSBLENDER_BIN" ]
+    then
+    echo "msblender binary $MSBLENDER_BIN not found!"
+    exit 0
+fi
+module load gsl
 
 
 DBNAME=${FASTAFILE/.fasta/}
 DBNAME=${DBNAME##*/}
 COMETOUT=${INPUTFILE}"."$DBNAME".comet"
 COMETPARAM="${PIPELINEDIR}/params/comet.params.new"
+if [ ! -f "$COMETPARAM" ]
+    then
+    echo "comet parameter file $COMETPARAM not found!"
+    exit 0
+fi
+#
+
 COMETEXE="${PIPELINEDIR}/exe/comet.linux.exe"
 
-#MYRIMATCHEXE="$SEARCHGUIDIR/resources/MyriMatch/linux/linux_64bit/myrimatch"
+if [ ! -f "$COMETEXE" ]
+    then
+    echo "comet executable $COMETEXE not found!"
+    exit 0
+fi
+#
+##MYRIMATCHEXE="$SEARCHGUIDIR/resources/MyriMatch/linux/linux_64bit/myrimatch"
 #MYRIMATCHEXE="$PIPELINEDIR/exe/myrimatch"
 
 
 #If using searchgui executables
 MSGFplus_JAR="$SEARCHGUIDIR/resources/MS-GF+/MSGFPlus.jar"
-
-
+if [ ! -f "$MSGFplus_JAR" ]
+    then
+    echo "msgfplus jar $MSGFplus_JAR not found!"
+    exit 0
+fi
+#
 #####
 #Researved for MS1 future analysis
 #OMSSAEXE="$SEARCHGUIDIR/resources/OMSSA/linux/omssacl"
@@ -80,6 +138,12 @@ MSGFplus_JAR="$SEARCHGUIDIR/resources/MS-GF+/MSGFPlus.jar"
 #XTANDEMEXE="$SEARCHGUIDIR/resources/XTandem/linux/linux_64bit/tandem"
 XTANDEMEXE="${PIPELINEDIR}/extern/tandem.linux.exe"
 
+if [ ! -f "$XTANDEMEXE" ]
+    then
+    echo "xtandem executable $XTANDEMEXE not found!"
+    exit 0
+fi
+#
 MSGFOUT=$WORKDIR/${INPUTFILE}.MSGF+
 
 
