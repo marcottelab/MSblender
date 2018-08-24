@@ -202,7 +202,7 @@ mkdir -p $TANDEMDIR
         #mv $TANDEMDIR/*tandemK.xml $WORKDIR
 	#MSGF+
 	TBL=${MSGFOUT/.mzid}.tsv
-	time java -Xmx20000M -jar $MSGFplus_JAR -d $FASTAFILE -s $1 -o ${MSGFOUT}.mzid -t 20ppm -tda 0 -ntt 2 -e 1 -inst 3
+	time java -Xmx20000M -jar $MSGFplus_JAR -d $FASTAFILE -s $1 -o ${MSGFOUT}.mzid -t 10ppm -tda 0 -ntt 2 -e 1 -inst 3 -maxCharge 6
  	time java -Xmx20000M -cp $MSGFplus_JAR edu.ucsd.msjava.ui.MzIDToTsv -i ${MSGFOUT}.mzid -o $TBL -showQValue 1 -showDecoy 1 -unroll 0
 
 
