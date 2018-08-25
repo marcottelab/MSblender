@@ -12,6 +12,9 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 
    This version is modified from JRH MS1-Quant-Pipeline but minus any MS1 quantification
    
+   It has been further modified to make parameters more consistent across search algorithms.
+   MS-GF+ options and PTMs are now defined in dedicated parameter files.
+   
    This repo contains:
 
     -  msblender MS2 analysis
@@ -55,8 +58,40 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 
     - an example analysis
    
+   
+   ## Search parameter configuration
+
+   Search engine parameter docs: [X!Tandem](https://www.thegpm.org/TANDEM/api/index.html), [Comet-2013020](http://comet-ms.sourceforge.net/parameters/parameters_201302/), and [MS-GF+](https://bix-lab.ucsd.edu/pages/viewpage.action?pageId=13533355).
+
+
+   Search parameters can be modified as necessary, but try to keep parameters consistent across search algorithms.
+
+   The default were selected with our standard MS experiments in mind:
+   
+   - high-res MS (10ppm precursor tolerance)
+   
+   - low-res MS/MS (ion trap) \*
+   
+   - tryptic digestion, no non-enzymatic termini
+   
+   - fixed cysteine carbamidomethylation (+57.021464, from iodoacetamide alkylation)
+   
+   - optional methionine oxidation (+15.9949)
+
+
+   _\* X!Tandem purportedly ignores fragment mass tolerance settings when using k-scoring and/or no "spectrum conditioning". (And it recommends turning conditioning off when using k-score.)_
+
+
+### Tips on changing search parameters
+
+   Comet parameter and MS-GF+ param and modification files are found in ./params
+
+   Comments within each should offer sufficient documentation.
+
+   X!Tandem parameters are found in ./search/tmpl/tandemK.high.xml
  
-#Compile msblender 
+ 
+# Compile msblender 
 
 Navigate to src/ and execute './compile'
 
@@ -66,13 +101,12 @@ You'll need GNU Scientific Library (gsl) and will likely have to modify the gsl 
 Change the two gcc commands to:
 
 
-gcc -Wall -I/opt/apps/gcc5_2/gsl/2.2.1/include/ -c *.c *.h
+`gcc -Wall -I/opt/apps/gcc5_2/gsl/2.2.1/include/ -c *.c *.h`
 
 
-gcc *.o -lgsl -L/opt/apps/gcc5_2/gsl/2.2.1/lib/ -lgslcblas -lm -o ./msblender
+`gcc *.o -lgsl -L/opt/apps/gcc5_2/gsl/2.2.1/lib/ -lgslcblas -lm -o ./msblender`
 
-This generates 'msblender' and 'msblender.h.gch
-
+This generates 'msblender' and 'msblender.h.gch'
 
 
 #Building OpenMS on your own machine...oof
