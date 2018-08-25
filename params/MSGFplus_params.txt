@@ -8,6 +8,9 @@
 # Precursor mass tolerance. This can be assymetric, ex. "-t 10ppm,4Da".
 -t 10ppm
 
+# Range of allowed isotope peak errors. default "0,1"
+-ti 0,2
+
 # Number of enzyme-specific termini.
 -ntt 2
 
@@ -17,6 +20,9 @@
 
 # Instrument ID. 0:Low-res MS/MS, 1:High-res, 2:TOF (10ppm MS/MS), 3:Q-Exactive HCD
 -inst 0
+
+# Fragmentation method. 0:As written in the spectrum or CID if no info(default), 1:CID, 2:ETD, 3:HCD
+# -m 0
 
 # Minimum precursor chargem, default 2
 # -minCharge 2
