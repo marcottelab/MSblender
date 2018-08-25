@@ -1,0 +1,32 @@
+# MS-GF+ parameters
+# Documentation: https://bix-lab.ucsd.edu/pages/viewpage.action?pageId=13533355
+
+# Comments are only allowed on lines starting with # symbol.
+# Make sure there is one space between parameter flag and value.
+# No spaces are allowed within a value.
+
+# Precursor mass tolerance. This can be assymetric, ex. "-t 10ppm,4Da".
+-t 10ppm
+
+# Number of enzyme-specific termini.
+-ntt 2
+
+# Enzyme ID. 0:nonspecific, 1:Trypsin(default), 2:Chymotrypsin, 3:Lys-C, 
+#            4:Lys-N, 5:Glu-C, 6: Arg-C, 7:Asp-N, 8:alphaLP, 9:no cleavage
+-e 1
+
+# Instrument ID. 0:Low-res MS/MS, 1:High-res, 2:TOF (10ppm MS/MS), 3:Q-Exactive HCD
+-inst 0
+
+# Minimum precursor chargem, default 2
+# -minCharge 2
+
+# Maximum precursor charge, default 3
+-maxCharge 6
+
+# Minimum peptide length, default 6
+# -minLength 6
+
+# Maximum peptide length, default 40
+# -maxLength 40
+
