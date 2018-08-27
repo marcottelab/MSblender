@@ -8,8 +8,8 @@
 <note type="input" label="output, log path">{FILENAME_LOG}</note>
 <note type="input" label="output, log path"></note>
 <note type="input" label="scoring, algorithm">k-score</note>
-<note type="input" label="spectrum, use conditioning" type="input">no</note>
-<note type="input" label="scoring, minimum ion count" type="input">4</note>
+<note label="spectrum, use conditioning" type="input">no</note>
+<note label="scoring, minimum ion count" type="input">4</note>
 <note type="input" label="output, results">valid</note>
 <note type="input" label="output, maximum valid expectation value">50</note>
 <note type="input" label="output, message">...busy...</note>

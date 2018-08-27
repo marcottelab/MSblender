@@ -137,7 +137,7 @@ then
     echo "MSGF+ modification file $MSFGplus_MODFILE not found! Using default of static C+57 and no optional modifications."
     MSGFplus_MODPARAM=""
 else
-    MSGFplus_MODPARAM=" -mod \"$MSFGplus_MODFILE\""
+    MSGFplus_MODPARAM=" -mod $MSFGplus_MODFILE"
 fi
 
 # Read and parse MS-GF+ param file. Append modification file parameter.
@@ -224,7 +224,7 @@ mkdir -p $TANDEMDIR
         #mv $TANDEMDIR/*tandemK.xml $WORKDIR
 	#MSGF+
 	TBL=${MSGFOUT/.mzid}.tsv
-	time java -Xmx20000M -jar $MSGFplus_JAR -d $FASTAFILE -s $1 -o ${MSGFOUT}.mzid -tda 0 "$MSGFplus_PARAMSTR"
+	time java -Xmx20000M -jar $MSGFplus_JAR -d $FASTAFILE -s $1 -o ${MSGFOUT}.mzid -tda 0 $MSGFplus_PARAMSTR
  	time java -Xmx20000M -cp $MSGFplus_JAR edu.ucsd.msjava.ui.MzIDToTsv -i ${MSGFOUT}.mzid -o $TBL -showQValue 1 -showDecoy 1 -unroll 0
 
 
