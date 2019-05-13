@@ -45,7 +45,6 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
    - Add on MS1 quantification
   
 
-
 # How to run
 
    Instructions for running are in https://github.com/marcottelab/run_msblender
@@ -191,6 +190,16 @@ make
 
 #Build SearchGUI on own machine
 
+# MSBlender Docker
+
+A full docker image with MSblender installed is available here: https://hub.docker.com/r/kdrew/msblender
+
+To run: 
+```
+docker pull kdrew/msblender
+
+docker run -v /project/kdrew/nextflow/test_data/:/data msblender /data/xl_animalcaps_SEC_Control_20a_20181121.mzXML /data/combined_contam_rev_file.fasta /data/working /data/output /searchgui
+```
 
 
 
