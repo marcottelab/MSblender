@@ -198,7 +198,7 @@ To run:
 ```
 docker pull kdrew/msblender
 
-docker run -v /project/kdrew/nextflow/test_data/:/data msblender /data/xl_animalcaps_SEC_Control_20a_20181121.mzXML /data/combined_contam_rev_file.fasta /data/working /data/output /searchgui
+docker run -v /test_data/:/data msblender /data/xl_animalcaps_SEC_Control_20a_20181121.mzXML /data/combined_contam_rev_file.fasta /data/working /data/output /searchgui
 ```
 
 
