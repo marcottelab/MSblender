@@ -68,7 +68,7 @@ output_sqtstream = 0                   # 0=no, 1=yes  write sqt to standard outp
 output_sqtfile = 0                     # 0=no, 1=yes  write sqt file
 output_txtfile = 0                     # 0=no, 1=yes  write tab-delimited txt file
 output_pepxmlfile = 1                  # 0=no, 1=yes  write pep.xml file
-output_percolatorfile = 0              # 0=no, 1=yes  write Percolator tab-delimited input file
+output_percolatorfile = 1              # 0=no, 1=yes  write Percolator tab-delimited input file
 print_expect_score = 1                 # 0=no, 1=yes to replace Sp with expect in out & sqt
 num_output_lines = 5                   # num peptide results to show
 show_fragment_ions = 0                 # 0=no, 1=yes for out files only
