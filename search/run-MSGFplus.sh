@@ -2,16 +2,16 @@
 MSGFplus_JAR="$HOME/git/MSblender/extern/MSGFPlus.jar"
 
 ## Path for the database, with decoy
-DB="/work/ups/db/UPS2013_combined.fa"
+DB="COMBINED.fa"
 
 ## Directory containing spectrum data (mzXML, mzML, etc)
-SOURCE_DIR="../mzXML.5ul/"
+SOURCE_DIR="../mzXML/"
 
 ## Extension of your raw file: mzXML, mzML, etc
 RAW_TYPE="mzXML"
 
 ## Number of threads 
-THREAD=2
+THREAD=4
 
 #[-e EnzymeID] (0: unspecific cleavage, 1: Trypsin (Default), 2: Chymotrypsin, 3: Lys-C, 4: Lys-N, 5: glutamyl endopeptidase, 6: Arg-C, 7: Asp-N, 8: alphaLP, 9: no cleavage)
 ENZYME=1
@@ -26,7 +26,6 @@ NTT=2
 #[-mod ModificationFileName] (Modification file, Default: standard amino acids with fixed C+57)
 
 DBNAME=$(basename $DB)
-DBNAME=${DBNAME/.fasta/}
 DBNAME=${DBNAME/.fa/}
 
 for RAW in $(ls $SOURCE_DIR/*$RAW_TYPE)
