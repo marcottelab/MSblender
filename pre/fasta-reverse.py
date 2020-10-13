@@ -26,8 +26,12 @@ f_fasta.close()
 
 f_target = open("%s.target" % filename_fasta, 'w')
 f_reverse = open("%s.reverse" % filename_fasta, 'w')
+f_combined = open("%s.combined" % filename_fasta, 'w')
 for h in seq.keys():
     f_reverse.write(">rv_%s\n%s\n" % (h, seq[h][::-1]))
     f_target.write(">%s\n%s\n " % (h, seq[h]))
+    f_combined.write(">rv_%s\n%s\n" % (h, seq[h][::-1]))
+    f_combined.write(">%s\n%s\n " % (h, seq[h]))
 f_reverse.close()
 f_target.close()
+f_combined.close()
