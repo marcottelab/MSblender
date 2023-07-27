@@ -3,7 +3,7 @@ import os
 import sys
 
 if( len(sys.argv) < 3 ):
-    sys.stderr.write("usage: python msblender_out-to-pep_count-mFDRpsm.py <msblender_out> <FDR_cutoff(eg 0.01)> <(optional: eFDRpsm, mFDRpsm)> \n") 
+    sys.stderr.write("usage: python msblender_out-to-pep_count-mFDRpsm.py <msblender_out> <FDR_cutoff(eg 0.01)> <(optional: eFDRpsm, mFDRpsm)> \n")
     sys.exit(1)
 
 filename_mb_out = sys.argv[1]
@@ -49,7 +49,7 @@ for tmp_psm in sorted(psm_mvScore.keys(),key=psm_mvScore.get,reverse=True):
     else:
         sys.stderr.write('No T/D info: %s\n. Exit.'%tmp_psm)
         sys.exit(1)
-    
+
     tmp_FDR = 0.0
     if( error_model == 'eFDRpsm' ):
         if( psm_mvScore[tmp_psm] < 1.0 ):
@@ -61,12 +61,12 @@ for tmp_psm in sorted(psm_mvScore.keys(),key=psm_mvScore.get,reverse=True):
     else:
         sys.stderr.write('No error model is defined. Exit.')
         sys.exit(1)
-    
+
     if( tmp_FDR < FDR_cutoff ):
         tmp_pep = tmp_psm.split('.')[-1]
         if( psm_TD[tmp_psm] == 'F' ):
             f_log.write('%s\t%.3f\t%.2f\n'%(tmp_psm,tmp_FDR,psm_mvScore[tmp_psm]))
-            
+
             sample_name = tmp_psm.split('.')[0]
             sample_list.append(sample_name)
             if( not pep_count.has_key(tmp_pep) ):
@@ -84,9 +84,15 @@ f_log.close()
 
 sample_list = sorted(list(set(sample_list)))
 
-sys.stderr.write('Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
+denom = len(pep_count)+len(D_pep_count)
+if ( denom == 0 ) :
+    pep_fdr = 1.0
+else:
+    pep_fdr = float(len(D_pep_count))/(len(pep_count)+len(D_pep_count))
+
+sys.stderr.write('Peptide FDR: %.3f\n'%( pep_fdr ))
 f_count = open('%s.pep_count_%s%s'%(filename_base, error_model,FDR_string),'w')
-f_count.write('#Peptide FDR: %.3f\n'%( float(len(D_pep_count))/(len(pep_count)+len(D_pep_count)) ))
+f_count.write('#Peptide FDR: %.3f\n'%( pep_fdr ))
 f_count.write('#PepSeq\tTotalCount\t%s\n'%('\t'.join(sample_list)))
 for tmp_pep in sorted(pep_count.keys(),key=pep_count.get):
     out_list = []
