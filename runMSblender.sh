@@ -10,8 +10,9 @@ IN_MZXML=$1
 FASTAFILE=$2
 WORKDIR=$3
 OUTPUTDIR=$4
-SEARCHGUIDIR=$5
-MIN_ENGINES=${6:-${MIN_ENGINES:-2}} # Allow setting as ENV var "MIN_ENGINES"
+LOGDIR0=${5:-'.'}
+SEARCHGUIDIR=$6
+MIN_ENGINES=${7:-${MIN_ENGINES:-2}} # Allow setting as ENV var "MIN_ENGINES"
 
 usage() { echo \
 "--------------------------------------------------------------------------
@@ -27,6 +28,8 @@ Usage: $PROG mzXML DBfasta [workdir outdir searchGUI minEngines(2)]
   outdir     (optional) Directory for final output files.
                         Defaults to a 'working' sub-directory at the
                         same level as the mzXML file mzXML directory.
+  logdir     (optional) Directory for this top-level script's log file.
+                        Default '.'
   searchGUI  (optional) Path to the SearchGUI directory. Defaults based
                         on run environment when POD or TACC.
   minEngines (optional) Minimum number of search engines that must succeed.
@@ -43,11 +46,16 @@ OUT_PFX=${OUT_PFX%.mzXML}
 echo "Output prefix: $OUT_PFX"
 
 # Direct our STDERR and STDOUT to log file
+LOGDIR=$(echo "$LOGDIR0" | perl -pe 's/ //g')
+if [[ "$LOGDIR" == "" ]]; then LOGDIR='.'; fi
+if [[ ! -d "$LOGDIR" ]]; then mkdir -p $LOGDIR; fi
+if [[ ! -d "$LOGDIR" ]]; then LOGDIR='.'; fi
+echo "LOGDIR is: '$LOGDIR' (was '$LOGDIR0')"
 LOG_TAG='runMSblender'
 show_only=${show_only:-0}
 if [[ "$show_only" == "0" ]]; then
-  exec 1> >(tee ./$OUT_PFX.$LOG_TAG.log) 2>&1
-  echo "Logging to ./$OUT_PFX.$LOG_TAG.log - `date`"
+  exec 1> >(tee $LOGDIR/$OUT_PFX.$LOG_TAG.log) 2>&1
+  echo "Logging to $LOGDIR/$OUT_PFX.$LOG_TAG.log - `date`"
 fi
 
 # ============================================================================
