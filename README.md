@@ -54,13 +54,13 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 
    ```bash
    # template command
-   /path/to/runMSblender.sh /path/to/mzXML/file /path/to/database/file /path/to/working/dir/ /path/to/output/dir
+   /path/to/runMSblender.sh /path/to/mzXML/file /path/to/database/file /path/to/working/dir/ /path/to/output/dir /path/to/logs/dir
    ```
 
    ```bash
    # for many mzXMLs (e.g., CFMS data)
-   for x in mzXML/*mzXML; do echo "/path/to/runMSblender.sh /path/to/mzXML/${x} /path/to/db/proteome_contam.combined.fasta /path/to/working/dir/ /path/to/output/dir/"; done > proj.msblender.cmds
-   cat proj.msblender.cmds 
+   for x in mzXML/*mzXML; do echo "/path/to/runMSblender.sh /path/to/mzXML/${x} /path/to/db/proteome_contam.combined.fasta /path/to/working/dir/ /path/to/output/dir/ /path/to/logs/dir/"; done > proj.msblender.cmds
+   cat proj.msblender.cmds | parallel -j4
    ```
 
    ```bash
@@ -75,6 +75,42 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 # Running the example
 
 This repo contains an "example" folder with the recommended directory structure provided above.
+
+  ```bash
+  # get repo
+  git clone https://github.com/marcottelab/MSblender.git
+  ```
+
+  ```bash
+  # switch to the example directory
+  cd MSblender/example/
+  ```
+  
+  ```bash
+  # make the database
+  cat db/caeel.fasta db/contam.fasta > db/caeel.contam.fasta
+  ```
+  
+  ```bash
+  # generate commands
+  for x in mzXML/*mzXML; do echo "../runMSblender.sh mzXML/${x} db/caeel.contam.fasta working output logs"; done > example.msblender.cmds
+  ```
+
+  ```bash
+  # run commands in parallel ("-j2" = 2 commands at a time, "-j4" = 4 commands at a time, etc)
+  for x in mzXML/*mzXML; do echo "../runMSblender.sh mzXML/${x} db/caeel.contam.fasta working output logs"; done > example.msblender.cmds
+  cat example.msblender.cmds | parallel -j4
+  ```
+
+  ```bash
+  # combine results into a table
+  python ../msblender-scripts/msblender2elution.py \
+   --prot_count_files output/*.group \
+   --output_filename example.prot_count_mFDRpsm001.unique.elut \
+   --fraction_name_from_filename \
+   --parse_uniprot_id --remove_zero_unique
+  ```
+  
 
 # Search parameter configuration
 
