@@ -54,7 +54,7 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 
    ```bash
    # template command
-   /MS/processed/leca/MSblender_consistent/runMSblender.sh /path/to/mzXML/file /path/to/database/file /path/to/working/dir/ /path/to/output/dir
+   /path/to/runMSblender.sh /path/to/mzXML/file /path/to/database/file /path/to/working/dir/ /path/to/output/dir
    ```
 
    ```bash
