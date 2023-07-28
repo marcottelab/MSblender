@@ -36,15 +36,31 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 
 # Quick start
 
-   Instructions for running are in https://github.com/marcottelab/run_msblender
+   ```bash
+   # set up directories (replace "proj" with your project name)
+   mkdir -p proj/{mzXML,db,working,output,logs}
+   ```
 
-   contains:
- 
-    - sample directory structure
- 
-    - instructions for how to run
+   ```bash
+   # symlink raw data to mzxml directory
+   ln -s /path/to/mzxmls/*mzXML proj/mzXML
+   ```
 
-    - an example analysis
+   ```bash
+   # make fasta database (replace "proteome" with your fasta name)
+   # there is a contam.fasta here: example_data/fastas/contam.fasta
+   cat proteome.fasta contam.fasta > proj/db/proteome_contam.combined.fasta
+   ```
+
+   ```bash
+   # template command
+   /MS/processed/leca/MSblender_consistent/runMSblender.sh /path/to/mzXML/file /path/to/database/file /path/to/working/dir/ /path/to/output/dir
+   ```
+
+   ```bash
+   # for many mzXMLs (e.g., CFMS data)
+   for x in proj/mzXML/*mzXML; do echo "/MS/processed/leca/MSblender_consistent/runMSblender.sh proj/mzXML/${x} proj/db/proteome_contam.combined.fasta proj/working proj/output"; done > proj/proj.msblender.cmds
+   ```
    
 
 # Search parameter configuration
@@ -89,7 +105,7 @@ docker pull kdrew/msblender
 docker run -v /test_data/:/data msblender /data/xl_animalcaps_SEC_Control_20a_20181121.mzXML /data/combined_contam_rev_file.fasta /data/working /data/output /searchgui
 ```
 
-## To do list
+# To do list
 
    - Myrimatch currently not working b/c of library issue 
   
