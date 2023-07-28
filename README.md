@@ -3,7 +3,7 @@ MSblender: a probabilistic approach for integrating peptide identifications
 from multiple database search engines
  
 See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) information.
- Citation
+ Citation:
 
     T. Kwon*, H. Choi*, C. Vogel, A.I. Nesvizhskii, and E.M. Marcotte, MSblender: a probabilistic approach for integrating peptide identifications from multiple database search engines. J. Proteome Research, 10(7): 2949–2958 (2011) Link 
 
@@ -37,7 +37,7 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 # Quick start
 
    ```bash
-   # set up directories (replace "proj" with your project name)
+   # set up directories (**replace "proj" with your project name**)
    mkdir -p proj/{mzXML,db,working,output,logs}
    ```
 
@@ -47,9 +47,9 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
    ```
 
    ```bash
-   # make fasta database (replace "proteome" with your fasta name)
-   # there is a contam.fasta here: example_data/fastas/contam.fasta
-   cat proteome.fasta contam.fasta > proj/db/proteome_contam.combined.fasta
+   # make fasta database (**replace "proteome" with your fasta name**)
+   # there is a contam.fasta here: example/fastas/contam.fasta
+   cat /path/to/proteome.fasta /path/to/contam.fasta > proj/db/proteome_contam.combined.fasta
    ```
 
    ```bash
@@ -59,9 +59,22 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
 
    ```bash
    # for many mzXMLs (e.g., CFMS data)
-   for x in proj/mzXML/*mzXML; do echo "/MS/processed/leca/MSblender_consistent/runMSblender.sh proj/mzXML/${x} proj/db/proteome_contam.combined.fasta proj/working proj/output"; done > proj/proj.msblender.cmds
+   for x in mzXML/*mzXML; do echo "/path/to/runMSblender.sh /path/to/mzXML/${x} /path/to/db/proteome_contam.combined.fasta /path/to/working/dir/ /path/to/output/dir/"; done > proj.msblender.cmds
+   cat proj.msblender.cmds 
    ```
-   
+
+   ```bash
+   # combine .group file for each fraction into one tab-separated output
+   python /path/to/msblender-scripts/msblender2elution.py \
+   --prot_count_files /path/to/output/dir/*.group \
+   --output_filename proj_output_name.prot_count_mFDRpsm001.unique.elut \
+   --fraction_name_from_filename \
+   --parse_uniprot_id --remove_zero_unique
+   ```
+
+# Running the example
+
+This repo contains an "example" folder with the recommended directory structure provided above.
 
 # Search parameter configuration
 
