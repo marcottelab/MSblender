@@ -58,8 +58,8 @@ See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) 
    ```
 
    ```bash
-   # for many mzXMLs (e.g., CFMS data)
-   for x in mzXML/*mzXML; do echo "/path/to/runMSblender.sh /path/to/mzXML/${x} /path/to/db/proteome_contam.combined.fasta /path/to/working/dir/ /path/to/output/dir/ /path/to/logs/dir/"; done > proj.msblender.cmds
+   # for many mzXMLs (e.g., CFMS data); parallel: "-j2" = 2 commands at a time, "-j4" = 4 commands at a time, etc
+   for x in mzXML/*mzXML; do echo "/path/to/runMSblender.sh ${x} /path/to/db/proteome_contam.combined.fasta /path/to/working/dir/ /path/to/output/dir/ /path/to/logs/dir/"; done > proj.msblender.cmds
    cat proj.msblender.cmds | parallel -j4
    ```
 
@@ -84,6 +84,9 @@ This repo contains an "example" folder with the recommended directory structure 
   ```bash
   # switch to the example directory
   cd MSblender/example/
+
+  # create directory skeleton (mzXML and db already exist)
+  mkdir {working,output,logs}
   ```
   
   ```bash
@@ -93,7 +96,7 @@ This repo contains an "example" folder with the recommended directory structure 
   
   ```bash
   # generate commands
-  for x in mzXML/*mzXML; do echo "../runMSblender.sh mzXML/${x} db/caeel.contam.fasta working output logs"; done > example.msblender.cmds
+  for x in mzXML/*mzXML; do echo "../runMSblender.sh ${x} db/caeel.contam.fasta working output logs"; done > example.msblender.cmds
   ```
 
   ```bash
