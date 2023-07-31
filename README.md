@@ -101,7 +101,6 @@ This repo contains an "example" folder with the recommended directory structure 
 
   ```bash
   # run commands in parallel ("-j2" = 2 commands at a time, "-j4" = 4 commands at a time, etc)
-  for x in mzXML/*mzXML; do echo "../runMSblender.sh mzXML/${x} db/caeel.contam.fasta working output logs"; done > example.msblender.cmds
   cat example.msblender.cmds | parallel -j4
   ```
 
