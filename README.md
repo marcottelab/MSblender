@@ -1,5 +1,5 @@
 # MSblender 
-MSblender: a probabilistic approach for integrating peptide identifications
+MSblender: a probabilistic approach for integrating peptide identifications 
 from multiple database search engines
  
 See http://www.marcottelab.org/index.php/MSblender for more (somewhat outdated) information.
